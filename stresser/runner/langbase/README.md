@@ -1,0 +1,2 @@
+# langbase
+Container with various preinstalled language compilers, interpreters, VM's etc. Should be used as a base for the actual runner. This split is designed so that updating the existing languages is simpler.
