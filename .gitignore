@@ -17,3 +17,7 @@
 .vscode/
 .idea/
 .DS_Store
+
+serverless/.aws-sam/
+
+serverless/y
