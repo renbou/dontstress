@@ -10,6 +10,12 @@ import (
 	"github.com/renbou/dontstress/stresser/runner/langexecute/util"
 )
 
+const (
+	STEP_INIT    = "init"
+	STEP_COMPILE = "compile"
+	STEP_RUN     = "run"
+)
+
 type Runner interface {
 	Prepare(path string) error
 	Run(r io.Reader, w io.Writer) error
@@ -45,9 +51,9 @@ func stepError(step string) func(error) *RunError {
 	}
 }
 
-var initError = stepError("init")
-var compileError = stepError("compile")
-var runError = stepError("run")
+var initError = stepError(STEP_INIT)
+var compileError = stepError(STEP_COMPILE)
+var runError = stepError(STEP_RUN)
 
 func WrapError(wrapper func(error) *RunError, err error) *RunError {
 	var re *RunError
