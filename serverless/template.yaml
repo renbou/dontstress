@@ -1,0 +1,190 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Transform: AWS::Serverless-2016-10-31
+Description: >
+  aws-pcms
+  
+  Sample SAM Template for aws-pcms
+
+# More info about Globals: https://github.com/awslabs/serverless-application-model/blob/master/docs/globals.rst
+Globals:
+  Function:
+    Timeout: 5
+Resources:
+  CreateLabFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: create-lab/
+      Handler: create-lab
+      Runtime: go1.x
+      Architectures:
+        - x86_64
+      Tracing: Active
+      Policies:
+        - DynamoDBCrudPolicy:
+            TableName: dont-stress-labs-table
+      Events:
+        CatchAll:
+          Type: HttpApi
+          Properties:
+            Path: /create-lab
+            Method: Post
+      Environment:
+        Variables:
+          LABS_TABLE_NAME: dont-stress-labs-table
+          TASKS_TABLE_NAME: dont-stress-tasks-table
+  GetLabFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: get-lab/
+      Handler: get-lab
+      Runtime: go1.x
+      Architectures:
+        - x86_64
+      Tracing: Active
+      Policies:
+        - DynamoDBCrudPolicy:
+            TableName: dont-stress-labs-table
+      Events:
+        CatchAll:
+          Type: HttpApi
+          Properties:
+            Path: /get-lab
+            Method: Get
+      Environment:
+        Variables:
+          LABS_TABLE_NAME: dont-stress-labs-table
+  CreateTaskFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: create-task/
+      Handler: create-task
+      Runtime: go1.x
+      Architectures:
+        - x86_64
+      Tracing: Active
+      Policies:
+        - DynamoDBCrudPolicy:
+            TableName: dont-stress-tasks-table
+      Events:
+        CatchAll:
+          Type: HttpApi
+          Properties:
+            Path: /create-task
+            Method: Post
+      Environment:
+        Variables:
+          TASKS_TABLE_NAME: dont-stress-tasks-table
+  UploadFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: upload/
+      Handler: upload
+      Runtime: go1.x
+      Architectures:
+        - x86_64
+      Tracing: Active
+      Events:
+        CatchAll:
+          Type: HttpApi
+          Properties:
+            Path: /upload
+            Method: Post
+      Environment:
+        Variables:
+          BUCKET_NAME: dont-stress-files-bucket
+          LABS_TABLE_NAME: dont-stress-labs-table
+  FilesBucket:
+    Type: AWS::S3::Bucket
+    Properties:
+      BucketName: dont-stress-files-bucket
+
+# TODO use auto-generated names
+
+  FilesTable:
+    Type: AWS::DynamoDB::Table
+    Properties: 
+      AttributeDefinitions: 
+        - AttributeName: id
+          AttributeType: S
+      KeySchema: 
+        - AttributeName: id
+          KeyType: HASH
+      BillingMode: PAY_PER_REQUEST
+      # StreamSpecification:
+      #   StreamViewType: NEW_IMAGE
+
+  TasksTable:
+    Type: AWS::DynamoDB::Table
+    Properties: 
+      TableName: dont-stress-tasks-table
+      AttributeDefinitions: 
+        - AttributeName: id
+          AttributeType: S
+      KeySchema: 
+        - AttributeName: id
+          KeyType: HASH
+      BillingMode: PAY_PER_REQUEST
+
+  LabsTable:
+    Type: AWS::DynamoDB::Table
+    Properties: 
+      TableName: dont-stress-labs-table
+      AttributeDefinitions: 
+        - AttributeName: id
+          AttributeType: S
+      KeySchema: 
+        - AttributeName: id
+          KeyType: HASH
+      BillingMode: PAY_PER_REQUEST
+
+  # AdminsTable:
+  #   Type: AWS::DynamoDB::Table
+  #   Properties: 
+  #     AttributeDefinitions: 
+  #       - AttributeName: id
+  #         AttributeType: S
+  #     KeySchema: 
+  #       - AttributeName: id
+  #         KeyType: HASH
+  #     BillingMode: PAY_PER_REQUEST
+  #     StreamSpecification:
+  #       StreamViewType: NEW_IMAGE
+
+  # LanguagesTable:
+  #   Type: AWS::DynamoDB::Table
+  #   Properties: 
+  #     AttributeDefinitions: 
+  #       - AttributeName: id
+  #         AttributeType: S
+  #     KeySchema: 
+  #       - AttributeName: id
+  #         KeyType: HASH
+  #     BillingMode: PAY_PER_REQUEST
+  #     StreamSpecification:
+  #       StreamViewType: NEW_IMAGE
+
+Outputs:
+  # ServerlessRestApi is an implicit API created out of Events key under Serverless::Function
+  # Find out more about other implicit resources you can reference within SAM
+  # https://github.com/awslabs/serverless-application-model/blob/master/docs/internals/generated_resources.rst#api
+  # HelloWorldAPI:
+  #   Description: "API Gateway endpoint URL for Prod environment for First Function"
+  #   Value: !Sub "https://${ServerlessRestApi}.execute-api.${AWS::Region}.amazonaws.com/Prod/hello/"
+  UploadFunction:
+    Description: "Second Lambda Function ARN"
+    Value: !GetAtt UploadFunction.Arn
+  UploadFunctionIamRole:
+    Description: "IAM Role created for Upload function"
+    Value: !GetAtt UploadFunctionRole.Arn
+  CreateTaskFunction:
+    Description: "Lambda Function ARN"
+    Value: !GetAtt UploadFunction.Arn
+  CreateTaskFunctionIamRole:
+    Description: "IAM Role created for function"
+    Value: !GetAtt UploadFunctionRole.Arn
+  CreateLabFunction:
+    Description: "Lambda Function ARN"
+    Value: !GetAtt UploadFunction.Arn
+  CreateLabFunctionIamRole:
+    Description: "IAM Role created for function"
+    Value: !GetAtt UploadFunctionRole.Arn
