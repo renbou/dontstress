@@ -1,41 +1,41 @@
 package runner
 
 import (
-	"errors"
-	"fmt"
-	"io"
 	"path/filepath"
 	"time"
 
 	"github.com/renbou/dontstress/stresser/runner/langexecute/util"
 )
 
-const (
-	STEP_INIT    = "init"
-	STEP_COMPILE = "compile"
-	STEP_RUN     = "run"
+// User-time error with info about when and what
+type UserError struct {
+	cause   string
+	message string
+}
+
+func UserErrorWithCause(cause string) func(string) *UserError {
+	return func(message string) *UserError {
+		return &UserError{cause, message}
+	}
+}
+
+var (
+	NewCompilationError = UserErrorWithCause("ce")
+	NewRuntimeError     = UserErrorWithCause("re")
+	NewMemoryLimitError = UserErrorWithCause("ml")
 )
+
+func (ue *UserError) Error() string {
+	return ue.message
+}
+
+func (ue *UserError) Cause() string {
+	return ue.cause
+}
 
 type Runner interface {
 	Prepare(path string) error
-	Run(r io.Reader, w io.Writer) error
-}
-
-type RunError struct {
-	runStep string
-	err     error
-}
-
-func (re *RunError) Step() string {
-	return re.runStep
-}
-
-func (re *RunError) Unwrap() error {
-	return re.err
-}
-
-func (re *RunError) Error() string {
-	return fmt.Sprintf("error %s during step %s", re.err.Error(), re.runStep)
+	Run(input string) (error, string)
 }
 
 type StepRunner struct {
@@ -43,51 +43,47 @@ type StepRunner struct {
 	RunStep     string   // how to launch the executable
 	directory   string   // temporary directory of current runner
 	file        string   // base filename
-}
-
-func stepError(step string) func(error) *RunError {
-	return func(err error) *RunError {
-		return &RunError{step, err}
-	}
-}
-
-var initError = stepError(STEP_INIT)
-var compileError = stepError(STEP_COMPILE)
-var runError = stepError(STEP_RUN)
-
-func WrapError(wrapper func(error) *RunError, err error) *RunError {
-	var re *RunError
-	if err != nil && !errors.As(err, &re) {
-		return wrapper(err)
-	} else {
-		return re
-	}
+	config      util.KV  // config for templates
 }
 
 func (s *StepRunner) Prepare(path string) error {
-	err := util.WithTempDir(func(dir string) error {
+	err, _ := util.WithTempDir(func(dir string) (error, interface{}) {
 		s.directory = dir
 		s.file = filepath.Base(path)
+		s.config = util.KV{
+			"File": s.file,
+			"Out":  util.RandomFileName(),
+		}
 
 		if err := util.CopyFile(path, s.file); err != nil {
-			return initError(err)
+			return err, nil
 		}
 		for _, cmd := range s.CompileStep {
-			if err := util.Exec(time.Second*10, cmd, s.file); err != nil {
-				return compileError(err)
+			if err, result := util.Exec("", time.Second*10, cmd, s.config); err != nil {
+				return err, nil
+			} else if result.Status != util.StatusOK {
+				return NewCompilationError(result.Stderr), nil
 			}
 		}
-		return nil
+		return nil, nil
 	})
-	return WrapError(initError, err)
+	return err
 }
 
-func (s *StepRunner) Run(r io.Reader, w io.Writer) error {
-	err := util.WithDir(func(_ string) error {
-		if err := util.RWExec(r, w, time.Second*5, s.RunStep, s.file); err != nil {
-			return runError(err)
+func (s *StepRunner) Run(input string) (error, string) {
+	err, data := util.WithDir(func(_ string) (error, interface{}) {
+		if err, result := util.Exec(input, time.Second*5, s.RunStep, s.config); err != nil {
+			return err, ""
+		} else {
+			switch result.Status {
+			case util.StatusML:
+				return NewMemoryLimitError(result.Stderr), result.Stdout
+			case util.StatusRE:
+				return NewRuntimeError(result.Stderr), result.Stdout
+			default:
+				return nil, result.Stdout
+			}
 		}
-		return nil
 	}, s.directory)
-	return WrapError(runError, err)
+	return err, data.(string)
 }

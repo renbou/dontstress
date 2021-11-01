@@ -11,11 +11,11 @@ func CompilerRunner(compiler string) *StepRunner {
 }
 
 var Runners = map[string]Runner{
-	"GCC-11": CompilerRunner("gcc"),
-	"G++-11": CompilerRunner("g++"),
-	"Python3.9": &StepRunner{
+	"GCC": CompilerRunner("gcc"),
+	"G++": CompilerRunner("g++"),
+	"Python": &StepRunner{
 		CompileStep: []string{},
 		RunStep:     "python {{.File}}",
 	},
-	"Go1.17.2": CompilerRunner("go"),
+	"Go": CompilerRunner("go"),
 }

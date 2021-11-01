@@ -3,7 +3,9 @@ package util
 import (
 	"errors"
 	"io"
+	"math/rand"
 	"os"
+	"strconv"
 )
 
 func ValidFile(path string) (bool, error) {
@@ -33,4 +35,8 @@ func CopyFile(from, to string) error {
 		return err
 	}
 	return nil
+}
+
+func RandomFileName() string {
+	return strconv.Itoa(rand.Int())
 }

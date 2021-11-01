@@ -11,22 +11,18 @@ func SwitchDir(path string) (oldpwd string, err error) {
 	return oldpwd, nil
 }
 
-func WithDir(wrapped func(string) error, dir string) error {
+func WithDir(wrapped func(string) (error, interface{}), dir string) (error, interface{}) {
 	if old, err := SwitchDir(dir); err != nil {
-		return err
+		return err, nil
 	} else {
 		defer SwitchDir(old)
 	}
-
-	if err := wrapped(dir); err != nil {
-		return err
-	}
-	return nil
+	return wrapped(dir)
 }
 
-func WithTempDir(wrapped func(string) error) error {
+func WithTempDir(wrapped func(string) (error, interface{})) (error, interface{}) {
 	if dir, err := os.MkdirTemp("", "stress"); err != nil {
-		return err
+		return err, nil
 	} else {
 		defer func() {
 			if err != nil {

@@ -1,9 +1,9 @@
 package util
 
 import (
+	"bytes"
 	"context"
 	"errors"
-	"io"
 	"os/exec"
 	"strings"
 	"time"
@@ -23,25 +23,51 @@ func Cmd(d time.Duration, fmt string, data interface{}) (*exec.Cmd, error) {
 
 }
 
-func Exec(d time.Duration, fmt string, data interface{}) error {
-	if cmd, err := Cmd(d, fmt, data); err != nil {
-		return err
-	} else if output, err := cmd.CombinedOutput(); err != nil {
-		return errors.New(string(output))
-	}
-	return nil
+var (
+	StatusOK = 0
+	StatusRE = 1
+	StatusML = 2
+)
+
+type ExecResult struct {
+	Status int
+	Code   int
+	Stdout string
+	Stderr string
 }
 
-func RWExec(r io.Reader, w io.Writer, d time.Duration, fmt string, data interface{}) error {
+func Exec(input string, d time.Duration, fmt string, data interface{}) (error, *ExecResult) {
 	cmd, err := Cmd(d, fmt, data)
 	if err != nil {
-		return err
+		return err, nil
 	}
-	cmd.Stdin = r
-	cmd.Stdout = w
-	cmd.Stderr = w
+
+	cmd.Stdin = strings.NewReader(input)
+	// 64 megabytes worth of data
+	stdout := bytes.NewBuffer(make([]byte, 63_000_000))
+	stderr := bytes.NewBuffer(make([]byte, 1_000_000))
+	cmd.Stdout = stdout
+	cmd.Stderr = stderr
+
 	if err := cmd.Run(); err != nil {
-		return err
+		exitErr := &exec.ExitError{}
+		if errors.As(err, &exitErr) {
+			// TODO
+			// Add memory limit error
+			return nil, &ExecResult{
+				Status: StatusRE,
+				Code:   exitErr.ExitCode(),
+				Stdout: stdout.String(),
+				Stderr: stderr.String(),
+			}
+		} else {
+			return err, nil
+		}
 	}
-	return nil
+	return nil, &ExecResult{
+		Status: StatusOK,
+		Code:   0,
+		Stdout: stdout.String(),
+		Stderr: stderr.String(),
+	}
 }

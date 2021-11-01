@@ -66,14 +66,14 @@ func main() {
 	}
 
 	var (
-		user       string // user to run program as
+		//user       string // user to run program as
 		lang       = os.Args[1]
 		path       = os.Args[2]
 		launchType = os.Args[3]
 	)
-	if user = os.Getenv("USER"); user == "" {
-		FatalInternal().Msg("Must specify lowpriv user to run as in the env variable USER")
-	}
+	// if user = os.Getenv("USER"); user == "" {
+	// 	FatalInternal().Msg("Must specify lowpriv user to run as in the env variable USER")
+	// }
 
 	if valid, err := util.ValidFile(path); err != nil {
 		FatalInternal().Msg("Unable to check " + path + " for validity")
