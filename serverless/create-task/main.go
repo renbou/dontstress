@@ -1,6 +1,7 @@
 package main
 
 import (
+	"fmt"
 	"github.com/aws/aws-lambda-go/events"
 	"github.com/aws/aws-lambda-go/lambda"
 	"github.com/aws/aws-sdk-go/aws"
@@ -36,12 +37,6 @@ type TaskDTO struct {
 	//Generator string `dynamo:"generator"`
 }
 
-//https://l6f5q1zrqb.execute-api.eu-west-1.amazonaws.com
-//curl -X POST http://127.0.0.1:3000/upload -F "file=@test.c;filename=test.c" -F "lang=GCC" -F "id=abobus" -F "name=pidortask" -F "type=validator"
-//curl -X POST http://127.0.0.1:3000/create-task -F "id=abobina" -F "name=pidortask"
-//curl -X POST https://l6f5q1zrqb.execute-api.eu-west-1.amazonaws.com/create-task -F "id=abobina" -F "name=pidortask"
-//curl -X POST https://l6f5q1zrqb.execute-api.eu-west-1.amazonaws.com/create-lab -F "id=abobina"
-
 func putData(upload *Upload) error {
 	sess := session.Must(session.NewSession())
 	db := dynamo.New(sess, &aws.Config{Region: aws.String(REGION)})
@@ -69,12 +64,14 @@ func handler(request events.APIGatewayV2HTTPRequest) (events.APIGatewayV2HTTPRes
 			})
 		}
 
-		_, err := lib.GetData(&lib.Upload{LabId: upload.LabId})
+		lab, err := lib.GetData(&lib.Upload{LabId: upload.LabId})
 		if err != nil {
 			return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{
 				"error": "lab is not found. " + err.Error(),
 			})
 		}
+
+		fmt.Println(lab)
 
 		err = putData(upload)
 		if err != nil {

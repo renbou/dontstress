@@ -1,14 +1,19 @@
-AWSTemplateFormatVersion: "2010-09-09"
+AWSTemplateFormatVersion: '2010-09-09'
 Transform: AWS::Serverless-2016-10-31
 Description: >
   aws-pcms
-
+  
   Sample SAM Template for aws-pcms
 
 # More info about Globals: https://github.com/awslabs/serverless-application-model/blob/master/docs/globals.rst
 Globals:
   Function:
     Timeout: 5
+    Environment:
+      Variables:
+        LABS_TABLE_NAME: dont-stress-labs-table
+        TASKS_TABLE_NAME: dont-stress-tasks-table
+
 Resources:
   LangsStatic:
     Type: AWS::Serverless::LayerVersion
@@ -80,6 +85,7 @@ Resources:
             Method: Post
       Environment:
         Variables:
+          LABS_TABLE_NAME: dont-stress-labs-table
           TASKS_TABLE_NAME: dont-stress-tasks-table
   UploadFunction:
     Type: AWS::Serverless::Function
@@ -99,21 +105,21 @@ Resources:
       Environment:
         Variables:
           BUCKET_NAME: dont-stress-files-bucket
-          LABS_TABLE_NAME: dont-stress-labs-table
+          TASKS_TABLE_NAME: dont-stress-tasks-table
   FilesBucket:
     Type: AWS::S3::Bucket
     Properties:
       BucketName: dont-stress-files-bucket
 
-  # TODO use auto-generated names
+# TODO use auto-generated names
 
   FilesTable:
     Type: AWS::DynamoDB::Table
-    Properties:
-      AttributeDefinitions:
+    Properties: 
+      AttributeDefinitions: 
         - AttributeName: id
           AttributeType: S
-      KeySchema:
+      KeySchema: 
         - AttributeName: id
           KeyType: HASH
       BillingMode: PAY_PER_REQUEST
@@ -122,35 +128,35 @@ Resources:
 
   TasksTable:
     Type: AWS::DynamoDB::Table
-    Properties:
+    Properties: 
       TableName: dont-stress-tasks-table
-      AttributeDefinitions:
+      AttributeDefinitions: 
         - AttributeName: id
           AttributeType: S
-      KeySchema:
+      KeySchema: 
         - AttributeName: id
           KeyType: HASH
       BillingMode: PAY_PER_REQUEST
 
   LabsTable:
     Type: AWS::DynamoDB::Table
-    Properties:
+    Properties: 
       TableName: dont-stress-labs-table
-      AttributeDefinitions:
+      AttributeDefinitions: 
         - AttributeName: id
           AttributeType: S
-      KeySchema:
+      KeySchema: 
         - AttributeName: id
           KeyType: HASH
       BillingMode: PAY_PER_REQUEST
 
   # AdminsTable:
   #   Type: AWS::DynamoDB::Table
-  #   Properties:
-  #     AttributeDefinitions:
+  #   Properties: 
+  #     AttributeDefinitions: 
   #       - AttributeName: id
   #         AttributeType: S
-  #     KeySchema:
+  #     KeySchema: 
   #       - AttributeName: id
   #         KeyType: HASH
   #     BillingMode: PAY_PER_REQUEST
@@ -159,11 +165,11 @@ Resources:
 
   # LanguagesTable:
   #   Type: AWS::DynamoDB::Table
-  #   Properties:
-  #     AttributeDefinitions:
+  #   Properties: 
+  #     AttributeDefinitions: 
   #       - AttributeName: id
   #         AttributeType: S
-  #     KeySchema:
+  #     KeySchema: 
   #       - AttributeName: id
   #         KeyType: HASH
   #     BillingMode: PAY_PER_REQUEST

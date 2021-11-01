@@ -22,9 +22,9 @@ const (
 )
 
 var (
-	BucketName = os.Getenv("BUCKET_NAME")
+	BucketName      = os.Getenv("BUCKET_NAME")
 	TasksDynamoName = os.Getenv("TASKS_TABLE_NAME")
-	s3session  *s3.S3
+	s3session       *s3.S3
 )
 
 func init() {
@@ -41,11 +41,10 @@ type Upload struct {
 }
 
 type TaskDTO struct {
-	id        string
-	labId     string
-	lang      string
-	validator string
-	generator string
+	labId     string `dynamo:"labId"`
+	id        string `dynamo:"id"`
+	validator string `dynamo:"validator"`
+	generator string `dynamo:"generator"`
 }
 
 //curl -X POST http://127.0.0.1:3000/upload -F "file=@test.c;filename=test.c" -F "lang=GCC" -F "id=abobalab" -F "name=pidortask" -F "type=validator"
@@ -66,15 +65,11 @@ func uploadFile(file *multipart.FileHeader) (string, error) {
 
 func updateData(upload *Upload, fileId string) error {
 	sess := session.Must(session.NewSession())
-	db := dynamo.New(sess, &aws.Config{Region: aws.String("us-west-1")})
+	db := dynamo.New(sess, &aws.Config{Region: aws.String(REGION)})
 	table := db.Table(TasksDynamoName)
-	task := TaskDTO{id: upload.TaskName, labId: upload.LabId, lang: upload.Language}
-	if upload.Type == "validator" {
-		task.validator = fileId
-	} else {
-		task.generator = fileId
-	}
-	return table.Update(upload.TaskName, task).Run()
+	update := table.Update("id", upload.TaskName)
+	update.Set(upload.Type, fileId)
+	return update.Run()
 }
 
 func handler(request events.APIGatewayV2HTTPRequest) (events.APIGatewayV2HTTPResponse, error) {
@@ -110,7 +105,7 @@ func handler(request events.APIGatewayV2HTTPRequest) (events.APIGatewayV2HTTPRes
 			err = updateData(upload, id)
 			if err != nil {
 				return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{
-					"error": "Failed to update dynamoDB",
+					"error": "Failed to update dynamoDB " + err.Error(),
 				})
 			}
 		}
