@@ -15,6 +15,11 @@ Globals:
         TASKS_TABLE_NAME: dont-stress-tasks-table
 
 Resources:
+  LangsStatic:
+    Type: AWS::Serverless::LayerVersion
+    Properties:
+      ContentUri: static/langs.json
+      Description: Supported languages
   CreateLabFunction:
     Type: AWS::Serverless::Function
     Properties:
@@ -37,6 +42,8 @@ Resources:
         Variables:
           LABS_TABLE_NAME: dont-stress-labs-table
           TASKS_TABLE_NAME: dont-stress-tasks-table
+      Layers:
+        - LangsStatic
   GetLabFunction:
     Type: AWS::Serverless::Function
     Properties:
