@@ -35,7 +35,5 @@ func GetData(upload *Upload) (Lab, error) {
 		One(&result)
 	fmt.Println(LabsDynamoName)
 	fmt.Println(kek)
-	fmt.Println(upload)
-	fmt.Println(result)
 	return result, err
 }

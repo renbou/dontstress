@@ -9,6 +9,11 @@ Description: >
 Globals:
   Function:
     Timeout: 5
+    Environment:
+      Variables:
+        LABS_TABLE_NAME: dont-stress-labs-table
+        TASKS_TABLE_NAME: dont-stress-tasks-table
+
 Resources:
   CreateLabFunction:
     Type: AWS::Serverless::Function
@@ -73,6 +78,7 @@ Resources:
             Method: Post
       Environment:
         Variables:
+          LABS_TABLE_NAME: dont-stress-labs-table
           TASKS_TABLE_NAME: dont-stress-tasks-table
   UploadFunction:
     Type: AWS::Serverless::Function
@@ -92,7 +98,7 @@ Resources:
       Environment:
         Variables:
           BUCKET_NAME: dont-stress-files-bucket
-          LABS_TABLE_NAME: dont-stress-labs-table
+          TASKS_TABLE_NAME: dont-stress-tasks-table
   FilesBucket:
     Type: AWS::S3::Bucket
     Properties:
