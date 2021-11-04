@@ -14,6 +14,7 @@ Globals:
         LABS_TABLE_NAME: dont-stress-labs-table
         TASKS_TABLE_NAME: dont-stress-tasks-table
         FILES_TABLE_NAME: dont-stress-files-table
+        RUNS_TABLE_NAME: dont-stress-testruns-table
         BUCKET_NAME: dont-stress-files-bucket
 
 Resources:

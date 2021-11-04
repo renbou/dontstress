@@ -16,3 +16,7 @@ func LabDao() interfaces.LabDao {
 func TaskDao() interfaces.TaskDao {
 	return &dynamodb.TaskImpl{}
 }
+
+func TestrunDao() interfaces.TestrunDao {
+	return &dynamodb.TestrunImpl{}
+}
