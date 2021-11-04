@@ -38,6 +38,10 @@ func handler(request events.APIGatewayV2HTTPRequest) (events.APIGatewayV2HTTPRes
 
 		id, err := S3.UploadFile(payload.Data)
 
+		if err = utils.Check(c, err); err != nil {
+			return err
+		}
+
 		file := models.File{Id: id, Lang: payload.Lang}
 
 		err = dao.FileDao().Create(&file)
@@ -55,10 +59,8 @@ func handler(request events.APIGatewayV2HTTPRequest) (events.APIGatewayV2HTTPRes
 		}
 
 		err = dao.TestrunDao().Create(&testrun)
-		if err != nil {
-			return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{
-				"error": err.Error(),
-			})
+		if err = utils.Check(c, err); err != nil {
+			return err
 		}
 
 		return c.JSON(testrun)
