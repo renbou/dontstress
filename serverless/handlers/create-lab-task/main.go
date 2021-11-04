@@ -6,24 +6,11 @@ import (
 	"github.com/aws/aws-lambda-go/lambda"
 	"github.com/gofiber/fiber/v2"
 	"github.com/renbou/aws-lambda-go-api-proxy/fiber"
-	"github.com/renbou/dontstress/serverless/handlers/dao/dynamodb"
+	"github.com/renbou/dontstress/serverless/handlers/dao"
 	"github.com/renbou/dontstress/serverless/handlers/models"
 	_ "io/ioutil"
 	_ "mime/multipart"
 )
-
-func NextIndex(tasks []models.Task) (max int) {
-	if len(tasks) == 0 {
-		return 0
-	}
-	max = tasks[0].Num
-	for _, v := range tasks {
-		if v.Num > max {
-			max = v.Num
-		}
-	}
-	return max + 1
-}
 
 func handler(request events.APIGatewayV2HTTPRequest) (events.APIGatewayV2HTTPResponse, error) {
 	app := fiber.New()
@@ -36,9 +23,14 @@ func handler(request events.APIGatewayV2HTTPRequest) (events.APIGatewayV2HTTPRes
 			})
 		}
 		task.LabId = c.Params("labid")
-		tasks, err := dynamodb.TaskImpl{}.GetAll(task.LabId)
-		task.Num = NextIndex(tasks)
-		err = dynamodb.TaskImpl{}.Create(task)
+		count, err := dao.TaskDao().GetCount(task.LabId)
+		if err != nil {
+			return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{
+				"error": err.Error(),
+			})
+		}
+		task.Num = count
+		err = dao.TaskDao().Create(&task)
 		if err != nil {
 			return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{
 				"error": err.Error(),

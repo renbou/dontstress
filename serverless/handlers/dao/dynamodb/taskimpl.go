@@ -32,6 +32,13 @@ func (dao *TaskImpl) Update(task *models.Task) error {
 	return update.Run()
 }
 
+func (dao *TaskImpl) GetCount(labId string) (int, error) {
+	db := getDB()
+	table := db.Table(TasksDynamoName)
+	count, err := table.Get("labid", labId).Count()
+	return int(count), err
+}
+
 func (dao *TaskImpl) GetAll(labId string) ([]models.Task, error) {
 	db := getDB()
 	table := db.Table(TasksDynamoName)
