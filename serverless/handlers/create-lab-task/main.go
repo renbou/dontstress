@@ -23,6 +23,7 @@ func handler(request events.APIGatewayV2HTTPRequest) (events.APIGatewayV2HTTPRes
 			})
 		}
 		task.LabId = c.Params("labid")
+		// TODO: generate ids
 		task.Num = 1
 		err = dynamodb.TaskImpl{}.Create(task)
 		if err != nil {

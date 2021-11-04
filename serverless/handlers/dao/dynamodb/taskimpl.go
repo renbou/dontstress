@@ -19,6 +19,19 @@ func (dao TaskImpl) Delete(task models.Task) error {
 	return table.Delete("labid", task.LabId).Range("num", task.Num).Run()
 }
 
+func (dao TaskImpl) Update(task *models.Task) error {
+	db := getDB()
+	table := db.Table(TasksDynamoName)
+	update := table.Update("labid", task.LabId).Range("num", task.Num)
+	if task.Generator != "" {
+		update.Set("generator", task.Generator)
+	}
+	if task.Validator != "" {
+		update.Set("validator", task.Validator)
+	}
+	return update.Run()
+}
+
 func (dao TaskImpl) GetAll(labId string) ([]models.Task, error) {
 	db := getDB()
 	table := db.Table(TasksDynamoName)

@@ -12,6 +12,7 @@ import (
 	"github.com/renbou/dontstress/serverless/handlers/models"
 	_ "io/ioutil"
 	_ "mime/multipart"
+	"strconv"
 )
 
 type payload struct {
@@ -26,8 +27,17 @@ func handler(request events.APIGatewayV2HTTPRequest) (events.APIGatewayV2HTTPRes
 	app := fiber.New()
 
 	app.Post("/lab/:labid/task/:taskid", func(c *fiber.Ctx) error {
+		labId := c.Params("labid")
+		taskId, err := strconv.Atoi(c.Params("taskid"))
+
+		if err != nil {
+			return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{
+				"error": err.Error(),
+			})
+		}
+
 		var payload payload
-		err := json.Unmarshal(c.Body(), &payload)
+		err = json.Unmarshal(c.Body(), &payload)
 
 		// TODO: handle errors in a better way
 		if err != nil {
@@ -46,6 +56,20 @@ func handler(request events.APIGatewayV2HTTPRequest) (events.APIGatewayV2HTTPRes
 		file := models.File{Id: id, Lang: payload.File.Lang}
 
 		err = dynamodb.FileImpl{}.Create(file)
+		if err != nil {
+			return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{
+				"error": err.Error(),
+			})
+		}
+
+		task := models.Task{LabId: labId, Num: taskId}
+		if payload.Filetype == "generator" {
+			task.Generator = id
+		} else {
+			task.Validator = id
+		}
+
+		err = dynamodb.TaskImpl{}.Update(&task)
 		if err != nil {
 			return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{
 				"error": err.Error(),
