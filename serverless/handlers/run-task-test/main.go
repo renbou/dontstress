@@ -6,48 +6,66 @@ import (
 	"github.com/aws/aws-lambda-go/lambda"
 	"github.com/gofiber/fiber/v2"
 	"github.com/renbou/aws-lambda-go-api-proxy/fiber"
+	"github.com/renbou/dontstress/serverless/handlers/dao"
 	"github.com/renbou/dontstress/serverless/handlers/dao/S3"
-	"github.com/renbou/dontstress/serverless/handlers/dao/dynamodb"
 	"github.com/renbou/dontstress/serverless/handlers/models"
-	_ "io/ioutil"
-	_ "mime/multipart"
+	"github.com/renbou/dontstress/serverless/handlers/utils"
+	"strconv"
 )
 
-type file struct {
-	lang string
-	data string
-}
-
 type payload struct {
-	filetype string
-	file     file
+	Lang string `json:"lang"`
+	Data string `json:"data"`
 }
 
 func handler(request events.APIGatewayV2HTTPRequest) (events.APIGatewayV2HTTPResponse, error) {
 	app := fiber.New()
 
 	app.Post("/lab/:labid/task/:taskid/test", func(c *fiber.Ctx) error {
-		//labId := c.Params("labid")
-		//taskId := c.Params("taskid")
+		labId := c.Params("labid")
+		taskId, err := strconv.Atoi(c.Params("taskid"))
+
+		if err != nil {
+			return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{
+				"error": err.Error(),
+			})
+		}
+
 		var payload payload
-		err := json.Unmarshal([]byte(c.Body()), &payload)
+		err = json.Unmarshal(c.Body(), &payload)
 		if err != nil {
 			return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{
 				"error": err.Error(),
 			})
 		}
 
-		id, err := S3.UploadFile(payload.file.data)
+		id, err := S3.UploadFile(payload.Data)
 
-		file := models.File{Id: id, Lang: payload.file.lang}
-		err = dynamodb.FileImpl{}.Create(file)
+		file := models.File{Id: id, Lang: payload.Lang}
+
+		err = dao.FileDao().Create(&file)
 		if err != nil {
 			return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{
 				"error": err.Error(),
 			})
 		}
 
-		return c.JSON(nil)
+		testrun := models.Run{
+			Id:     utils.GetId(),
+			Labid:  labId,
+			Taskid: taskId,
+			Fileid: id,
+			Status: "QUEUE",
+		}
+
+		err = dao.TestrunDao().Create(&testrun)
+		if err != nil {
+			return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{
+				"error": err.Error(),
+			})
+		}
+
+		return c.JSON(testrun)
 	})
 
 	adapter := fiberadapter.New(app)
