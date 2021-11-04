@@ -2,12 +2,12 @@ package S3
 
 import (
 	"bytes"
+	"github.com/renbou/dontstress/serverless/handlers/utils"
 	"os"
 
 	"github.com/aws/aws-sdk-go/aws"
 	"github.com/aws/aws-sdk-go/aws/session"
 	"github.com/aws/aws-sdk-go/service/s3"
-	"github.com/google/uuid"
 )
 
 const (
@@ -25,7 +25,7 @@ func getSession() *s3.S3 {
 }
 
 func UploadFile(content string) (string, error) {
-	id := uuid.New().String()
+	id := utils.GetId()
 	_, err := getSession().PutObject(&s3.PutObjectInput{
 		Body:   bytes.NewReader([]byte(content)),
 		Bucket: aws.String(BucketName),
