@@ -7,8 +7,8 @@ import (
 	_ "github.com/go-playground/validator"
 	"github.com/gofiber/fiber/v2"
 	"github.com/renbou/aws-lambda-go-api-proxy/fiber"
+	"github.com/renbou/dontstress/serverless/handlers/dao"
 	"github.com/renbou/dontstress/serverless/handlers/dao/S3"
-	"github.com/renbou/dontstress/serverless/handlers/dao/dynamodb"
 	"github.com/renbou/dontstress/serverless/handlers/models"
 	_ "io/ioutil"
 	_ "mime/multipart"
@@ -55,7 +55,7 @@ func handler(request events.APIGatewayV2HTTPRequest) (events.APIGatewayV2HTTPRes
 
 		file := models.File{Id: id, Lang: payload.File.Lang}
 
-		err = dynamodb.FileImpl{}.Create(file)
+		err = dao.FileDao().Create(&file)
 		if err != nil {
 			return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{
 				"error": err.Error(),
@@ -69,7 +69,7 @@ func handler(request events.APIGatewayV2HTTPRequest) (events.APIGatewayV2HTTPRes
 			task.Validator = id
 		}
 
-		err = dynamodb.TaskImpl{}.Update(&task)
+		err = dao.TaskDao().Update(&task)
 		if err != nil {
 			return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{
 				"error": err.Error(),

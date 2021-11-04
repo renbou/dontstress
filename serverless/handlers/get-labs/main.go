@@ -5,14 +5,14 @@ import (
 	"github.com/aws/aws-lambda-go/lambda"
 	"github.com/gofiber/fiber/v2"
 	"github.com/renbou/aws-lambda-go-api-proxy/fiber"
-	"github.com/renbou/dontstress/serverless/handlers/dao/dynamodb"
+	"github.com/renbou/dontstress/serverless/handlers/dao"
 )
 
 func handler(request events.APIGatewayV2HTTPRequest) (events.APIGatewayV2HTTPResponse, error) {
 	app := fiber.New()
 
 	app.Get("/labs", func(c *fiber.Ctx) error {
-		labs, err := dynamodb.LabImpl{}.GetAll()
+		labs, err := dao.LabDao().GetAll()
 		if err != nil {
 			return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{
 				"error": err.Error(),

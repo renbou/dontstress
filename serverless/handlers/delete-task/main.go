@@ -5,7 +5,7 @@ import (
 	"github.com/aws/aws-lambda-go/lambda"
 	"github.com/gofiber/fiber/v2"
 	"github.com/renbou/aws-lambda-go-api-proxy/fiber"
-	"github.com/renbou/dontstress/serverless/handlers/dao/dynamodb"
+	"github.com/renbou/dontstress/serverless/handlers/dao"
 	"github.com/renbou/dontstress/serverless/handlers/models"
 	_ "io/ioutil"
 	_ "mime/multipart"
@@ -25,7 +25,7 @@ func handler(request events.APIGatewayV2HTTPRequest) (events.APIGatewayV2HTTPRes
 		}
 
 		task := models.Task{Num: taskId, LabId: labId}
-		err = dynamodb.TaskImpl{}.Delete(task)
+		err = dao.TaskDao().Delete(&task)
 		if err != nil {
 			return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{
 				"error": err.Error(),
