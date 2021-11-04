@@ -12,9 +12,10 @@ const (
 )
 
 var (
-	LabsDynamoName  = os.Getenv("LABS_TABLE_NAME")
-	TasksDynamoName = os.Getenv("TASKS_TABLE_NAME")
-	FilesDynamoName = os.Getenv("FILES_TABLE_NAME")
+	LabsDynamoName     = os.Getenv("LABS_TABLE_NAME")
+	TasksDynamoName    = os.Getenv("TASKS_TABLE_NAME")
+	FilesDynamoName    = os.Getenv("FILES_TABLE_NAME")
+	TestrunsDynamoName = os.Getenv("RUNS_TABLE_NAME")
 )
 
 func getDB() *dynamo.DB {
