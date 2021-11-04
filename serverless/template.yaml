@@ -1,9 +1,9 @@
 AWSTemplateFormatVersion: '2010-09-09'
 Transform: AWS::Serverless-2016-10-31
 Description: >
-  aws-pcms
+  dont-stress-tester
   
-  Sample SAM Template for aws-pcms
+  Sample SAM Template for dont-stress-tester
 
 # More info about Globals: https://github.com/awslabs/serverless-application-model/blob/master/docs/globals.rst
 Globals:
@@ -13,17 +13,20 @@ Globals:
       Variables:
         LABS_TABLE_NAME: dont-stress-labs-table
         TASKS_TABLE_NAME: dont-stress-tasks-table
+        FILES_TABLE_NAME: dont-stress-files-table
+        BUCKET_NAME: dont-stress-files-bucket
 
 Resources:
   LangsStatic:
     Type: AWS::Serverless::LayerVersion
     Properties:
-      ContentUri: static/langs.json
+      ContentUri: static/
       Description: Supported languages
+
   CreateLabFunction:
     Type: AWS::Serverless::Function
     Properties:
-      CodeUri: create-lab/
+      CodeUri: ./handlers/create-lab/
       Handler: create-lab
       Runtime: go1.x
       Architectures:
@@ -36,19 +39,16 @@ Resources:
         CatchAll:
           Type: HttpApi
           Properties:
-            Path: /create-lab
+            Path: /labs
             Method: Post
-      Environment:
-        Variables:
-          LABS_TABLE_NAME: dont-stress-labs-table
-          TASKS_TABLE_NAME: dont-stress-tasks-table
       Layers:
-        - LangsStatic
-  GetLabFunction:
+        - !Ref LangsStatic
+
+  GetLabsFunction:
     Type: AWS::Serverless::Function
     Properties:
-      CodeUri: get-lab/
-      Handler: get-lab
+      CodeUri: ./handlers/get-labs/
+      Handler: get-labs
       Runtime: go1.x
       Architectures:
         - x86_64
@@ -60,16 +60,33 @@ Resources:
         CatchAll:
           Type: HttpApi
           Properties:
-            Path: /get-lab
+            Path: /labs
             Method: Get
-      Environment:
-        Variables:
-          LABS_TABLE_NAME: dont-stress-labs-table
+
+  DeleteLabFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: ./handlers/delete-lab/
+      Handler: delete-lab
+      Runtime: go1.x
+      Architectures:
+        - x86_64
+      Tracing: Active
+      Policies:
+        - DynamoDBCrudPolicy:
+            TableName: dont-stress-labs-table
+      Events:
+        CatchAll:
+          Type: HttpApi
+          Properties:
+            Path: /lab/{labid}
+            Method: Delete
+
   CreateTaskFunction:
     Type: AWS::Serverless::Function
     Properties:
-      CodeUri: create-task/
-      Handler: create-task
+      CodeUri: ./handlers/create-lab-task/
+      Handler: create-lab-task
       Runtime: go1.x
       Architectures:
         - x86_64
@@ -81,17 +98,14 @@ Resources:
         CatchAll:
           Type: HttpApi
           Properties:
-            Path: /create-task
+            Path: /lab/{labid}/tasks
             Method: Post
-      Environment:
-        Variables:
-          LABS_TABLE_NAME: dont-stress-labs-table
-          TASKS_TABLE_NAME: dont-stress-tasks-table
-  UploadFunction:
+
+  GetLabTasksFunction:
     Type: AWS::Serverless::Function
     Properties:
-      CodeUri: upload/
-      Handler: upload
+      CodeUri: ./handlers/get-lab-tasks/
+      Handler: get-lab-tasks
       Runtime: go1.x
       Architectures:
         - x86_64
@@ -100,22 +114,96 @@ Resources:
         CatchAll:
           Type: HttpApi
           Properties:
-            Path: /upload
+            Path: /lab/{labid}/tasks
+            Method: Get
+
+  AddTaskDataFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: ./handlers/add-task-data/
+      Handler: add-task-data
+      Runtime: go1.x
+      Architectures:
+        - x86_64
+      Tracing: Active
+      Policies:
+        - DynamoDBCrudPolicy:
+            TableName: dont-stress-tasks-table
+      Events:
+        CatchAll:
+          Type: HttpApi
+          Properties:
+            Path: /lab/{labid}/task/{taskid}
             Method: Post
-      Environment:
-        Variables:
-          BUCKET_NAME: dont-stress-files-bucket
-          TASKS_TABLE_NAME: dont-stress-tasks-table
+
+  DeleteTaskFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: ./handlers/delete-task/
+      Handler: delete-task
+      Runtime: go1.x
+      Architectures:
+        - x86_64
+      Tracing: Active
+      Policies:
+        - DynamoDBCrudPolicy:
+            TableName: dont-stress-tasks-table
+      Events:
+        CatchAll:
+          Type: HttpApi
+          Properties:
+            Path: /lab/{labid}/task/{taskid}
+            Method: Delete
+
+  PollTaskTestFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: ./handlers/poll-task-test/
+      Handler: poll-task-test
+      Runtime: go1.x
+      Architectures:
+        - x86_64
+      Tracing: Active
+      Policies:
+        - DynamoDBCrudPolicy:
+            TableName: dont-stress-tasks-table
+      Events:
+        CatchAll:
+          Type: HttpApi
+          Properties:
+            Path: /lab/{labid}/task/{taskid}/test
+            Method: GET
+
+  RunTaskTestFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: ./handlers/run-task-test/
+      Handler: run-task-test
+      Runtime: go1.x
+      Architectures:
+        - x86_64
+      Tracing: Active
+      Policies:
+        - DynamoDBCrudPolicy:
+            TableName: dont-stress-tasks-table
+      Events:
+        CatchAll:
+          Type: HttpApi
+          Properties:
+            Path: /lab/{labid}/task/{taskid}/test
+            Method: Post
+
   FilesBucket:
     Type: AWS::S3::Bucket
     Properties:
       BucketName: dont-stress-files-bucket
 
-# TODO use auto-generated names
+# TODO replace with auto-generated names
 
   FilesTable:
     Type: AWS::DynamoDB::Table
-    Properties: 
+    Properties:
+      TableName: dont-stress-files-table
       AttributeDefinitions: 
         - AttributeName: id
           AttributeType: S
@@ -131,11 +219,15 @@ Resources:
     Properties: 
       TableName: dont-stress-tasks-table
       AttributeDefinitions: 
-        - AttributeName: id
+        - AttributeName: labid
           AttributeType: S
+        - AttributeName: num
+          AttributeType: N
       KeySchema: 
-        - AttributeName: id
+        - AttributeName: labid
           KeyType: HASH
+        - AttributeName: num
+          KeyType: RANGE
       BillingMode: PAY_PER_REQUEST
 
   LabsTable:
@@ -150,6 +242,20 @@ Resources:
           KeyType: HASH
       BillingMode: PAY_PER_REQUEST
 
+  TestRunsTable:
+    Type: AWS::DynamoDB::Table
+    Properties:
+      TableName: dont-stress-testruns-table
+      AttributeDefinitions:
+        - AttributeName: id
+          AttributeType: S
+      KeySchema:
+        - AttributeName: id
+          KeyType: HASH
+      BillingMode: PAY_PER_REQUEST
+
+# TODO implement authorization
+
   # AdminsTable:
   #   Type: AWS::DynamoDB::Table
   #   Properties: 
@@ -162,42 +268,3 @@ Resources:
   #     BillingMode: PAY_PER_REQUEST
   #     StreamSpecification:
   #       StreamViewType: NEW_IMAGE
-
-  # LanguagesTable:
-  #   Type: AWS::DynamoDB::Table
-  #   Properties: 
-  #     AttributeDefinitions: 
-  #       - AttributeName: id
-  #         AttributeType: S
-  #     KeySchema: 
-  #       - AttributeName: id
-  #         KeyType: HASH
-  #     BillingMode: PAY_PER_REQUEST
-  #     StreamSpecification:
-  #       StreamViewType: NEW_IMAGE
-
-Outputs:
-  # ServerlessRestApi is an implicit API created out of Events key under Serverless::Function
-  # Find out more about other implicit resources you can reference within SAM
-  # https://github.com/awslabs/serverless-application-model/blob/master/docs/internals/generated_resources.rst#api
-  # HelloWorldAPI:
-  #   Description: "API Gateway endpoint URL for Prod environment for First Function"
-  #   Value: !Sub "https://${ServerlessRestApi}.execute-api.${AWS::Region}.amazonaws.com/Prod/hello/"
-  UploadFunction:
-    Description: "Second Lambda Function ARN"
-    Value: !GetAtt UploadFunction.Arn
-  UploadFunctionIamRole:
-    Description: "IAM Role created for Upload function"
-    Value: !GetAtt UploadFunctionRole.Arn
-  CreateTaskFunction:
-    Description: "Lambda Function ARN"
-    Value: !GetAtt UploadFunction.Arn
-  CreateTaskFunctionIamRole:
-    Description: "IAM Role created for function"
-    Value: !GetAtt UploadFunctionRole.Arn
-  CreateLabFunction:
-    Description: "Lambda Function ARN"
-    Value: !GetAtt UploadFunction.Arn
-  CreateLabFunctionIamRole:
-    Description: "IAM Role created for function"
-    Value: !GetAtt UploadFunctionRole.Arn
