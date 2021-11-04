@@ -53,6 +53,9 @@ interface TestRunsEntry {
   // Simple primary key
   id: string;
   // Attributes
+  labid: string;
+  taskid: number;
+  fileid: string;
   status: TaskStatus;
   tests: {
     result: TestResult;
