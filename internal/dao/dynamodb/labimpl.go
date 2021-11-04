@@ -23,7 +23,7 @@ func (dao *LabImpl) GetById(labId string) (*models.Lab, error) {
 	db := getDB()
 	table := db.Table(LabsDynamoName)
 	var result models.Lab
-	err := table.Get("labid", labId).One(&result)
+	err := table.Get("id", labId).One(&result)
 	return &result, err
 }
 
