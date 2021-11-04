@@ -12,6 +12,19 @@ import (
 	_ "mime/multipart"
 )
 
+func NextIndex(tasks []models.Task) (max int) {
+	if len(tasks) == 0 {
+		return 0
+	}
+	max = tasks[0].Num
+	for _, v := range tasks {
+		if v.Num > max {
+			max = v.Num
+		}
+	}
+	return max + 1
+}
+
 func handler(request events.APIGatewayV2HTTPRequest) (events.APIGatewayV2HTTPResponse, error) {
 	app := fiber.New()
 	app.Post("/lab/:labid/tasks", func(c *fiber.Ctx) error {
@@ -23,8 +36,8 @@ func handler(request events.APIGatewayV2HTTPRequest) (events.APIGatewayV2HTTPRes
 			})
 		}
 		task.LabId = c.Params("labid")
-		// TODO: generate ids
-		task.Num = 1
+		tasks, err := dynamodb.TaskImpl{}.GetAll(task.LabId)
+		task.Num = NextIndex(tasks)
 		err = dynamodb.TaskImpl{}.Create(task)
 		if err != nil {
 			return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{
