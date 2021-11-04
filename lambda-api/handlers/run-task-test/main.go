@@ -26,18 +26,14 @@ func handler(request events.APIGatewayV2HTTPRequest) (events.APIGatewayV2HTTPRes
 		labId := c.Params("labid")
 		taskId, err := strconv.Atoi(c.Params("taskid"))
 
-		if err != nil {
-			return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{
-				"error": err.Error(),
-			})
+		if err = utils.Check(c, err); err != nil {
+			return err
 		}
 
 		var payload payload
 		err = json.Unmarshal(c.Body(), &payload)
-		if err != nil {
-			return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{
-				"error": err.Error(),
-			})
+		if err = utils.Check(c, err); err != nil {
+			return err
 		}
 
 		id, err := S3.UploadFile(payload.Data)
@@ -45,10 +41,9 @@ func handler(request events.APIGatewayV2HTTPRequest) (events.APIGatewayV2HTTPRes
 		file := models.File{Id: id, Lang: payload.Lang}
 
 		err = dao.FileDao().Create(&file)
-		if err != nil {
-			return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{
-				"error": err.Error(),
-			})
+
+		if err = utils.Check(c, err); err != nil {
+			return err
 		}
 
 		testrun := models.Run{

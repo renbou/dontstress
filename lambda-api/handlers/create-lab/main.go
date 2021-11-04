@@ -21,18 +21,14 @@ func handler(request events.APIGatewayV2HTTPRequest) (events.APIGatewayV2HTTPRes
 	app.Post("/labs", func(c *fiber.Ctx) error {
 		var lab models.Lab
 		err := json.Unmarshal(c.Body(), &lab)
-		if err != nil {
-			return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{
-				"error": err.Error(),
-			})
+		if err = utils.Check(c, err); err != nil {
+			return err
 		}
 
 		err = dao.LabDao().Create(&lab)
 
-		if err != nil {
-			return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{
-				"error": err.Error(),
-			})
+		if err = utils.Check(c, err); err != nil {
+			return err
 		}
 		id := utils.GetId()
 		lab.Id = id

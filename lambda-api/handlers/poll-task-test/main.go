@@ -1,6 +1,7 @@
 package main
 
 import (
+	"github.com/renbou/dontstress/internal/utils"
 	"strconv"
 
 	"github.com/aws/aws-lambda-go/events"
@@ -18,10 +19,8 @@ func handler(request events.APIGatewayV2HTTPRequest) (events.APIGatewayV2HTTPRes
 		taskId, err := strconv.Atoi(c.Params("taskid"))
 		id := c.Query("id")
 		testrun, err := dao.TestrunDao().GetById(id)
-		if err != nil {
-			return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{
-				"error": err.Error(),
-			})
+		if err = utils.Check(c, err); err != nil {
+			return err
 		}
 
 		if testrun.Labid != labId || testrun.Taskid != taskId {

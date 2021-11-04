@@ -2,6 +2,7 @@ package main
 
 import (
 	"encoding/json"
+	"github.com/renbou/dontstress/internal/utils"
 	_ "io/ioutil"
 	_ "mime/multipart"
 	"strconv"
@@ -31,36 +32,27 @@ func handler(request events.APIGatewayV2HTTPRequest) (events.APIGatewayV2HTTPRes
 		labId := c.Params("labid")
 		taskId, err := strconv.Atoi(c.Params("taskid"))
 
-		if err != nil {
-			return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{
-				"error": err.Error(),
-			})
+		if err = utils.Check(c, err); err != nil {
+			return err
 		}
 
 		var payload payload
 		err = json.Unmarshal(c.Body(), &payload)
 
-		// TODO: handle errors in a better way
-		if err != nil {
-			return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{
-				"error": err.Error(),
-			})
+		if err = utils.Check(c, err); err != nil {
+			return err
 		}
 
 		id, err := S3.UploadFile(payload.File.Data)
-		if err != nil {
-			return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{
-				"error": err.Error(),
-			})
+		if err = utils.Check(c, err); err != nil {
+			return err
 		}
 
 		file := models.File{Id: id, Lang: payload.File.Lang}
 
 		err = dao.FileDao().Create(&file)
-		if err != nil {
-			return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{
-				"error": err.Error(),
-			})
+		if err = utils.Check(c, err); err != nil {
+			return err
 		}
 
 		task := models.Task{LabId: labId, Num: taskId}
@@ -71,10 +63,8 @@ func handler(request events.APIGatewayV2HTTPRequest) (events.APIGatewayV2HTTPRes
 		}
 
 		err = dao.TaskDao().Update(&task)
-		if err != nil {
-			return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{
-				"error": err.Error(),
-			})
+		if err = utils.Check(c, err); err != nil {
+			return err
 		}
 
 		return c.JSON(file)

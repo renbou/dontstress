@@ -1,6 +1,7 @@
 package main
 
 import (
+	"github.com/renbou/dontstress/internal/utils"
 	_ "io/ioutil"
 	_ "mime/multipart"
 	"strconv"
@@ -19,18 +20,14 @@ func handler(request events.APIGatewayV2HTTPRequest) (events.APIGatewayV2HTTPRes
 	app.Delete("/lab/:labid/task/:taskid", func(c *fiber.Ctx) error {
 		labId := c.Params("labid")
 		taskId, err := strconv.Atoi(c.Params("taskid"))
-		if err != nil {
-			return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{
-				"error": err.Error(),
-			})
+		if err = utils.Check(c, err); err != nil {
+			return err
 		}
 
 		task := models.Task{Num: taskId, LabId: labId}
 		err = dao.TaskDao().Delete(&task)
-		if err != nil {
-			return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{
-				"error": err.Error(),
-			})
+		if err = utils.Check(c, err); err != nil {
+			return err
 		}
 		return c.Status(fiber.StatusOK).JSON(fiber.Map{})
 	})

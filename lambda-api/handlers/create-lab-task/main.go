@@ -2,6 +2,7 @@ package main
 
 import (
 	"encoding/json"
+	"github.com/renbou/dontstress/internal/utils"
 	_ "io/ioutil"
 	_ "mime/multipart"
 
@@ -18,24 +19,18 @@ func handler(request events.APIGatewayV2HTTPRequest) (events.APIGatewayV2HTTPRes
 	app.Post("/lab/:labid/tasks", func(c *fiber.Ctx) error {
 		var task models.Task
 		err := json.Unmarshal(c.Body(), &task)
-		if err != nil {
-			return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{
-				"error": err.Error(),
-			})
+		if err = utils.Check(c, err); err != nil {
+			return err
 		}
 		task.LabId = c.Params("labid")
 		count, err := dao.TaskDao().GetCount(task.LabId)
-		if err != nil {
-			return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{
-				"error": err.Error(),
-			})
+		if err = utils.Check(c, err); err != nil {
+			return err
 		}
 		task.Num = count
 		err = dao.TaskDao().Create(&task)
-		if err != nil {
-			return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{
-				"error": err.Error(),
-			})
+		if err = utils.Check(c, err); err != nil {
+			return err
 		}
 		return c.JSON(task)
 	})
