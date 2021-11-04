@@ -5,20 +5,31 @@ import (
 	"github.com/aws/aws-lambda-go/lambda"
 	"github.com/gofiber/fiber/v2"
 	"github.com/renbou/aws-lambda-go-api-proxy/fiber"
-	_ "io/ioutil"
-	_ "mime/multipart"
+	"github.com/renbou/dontstress/serverless/handlers/dao"
+	"strconv"
 )
 
 func handler(request events.APIGatewayV2HTTPRequest) (events.APIGatewayV2HTTPResponse, error) {
 	app := fiber.New()
 
 	app.Get("/lab/:labid/task/:taskid/test", func(c *fiber.Ctx) error {
-		// TODO: implement polling
-		//labId := c.Params("labid")
-		//taskId := c.Params("taskid")
-		//file := models.File{Id: }
-		//dynamodb.FileImpl{}.Create()
-		return c.JSON(nil)
+		labId := c.Params("labid")
+		taskId, err := strconv.Atoi(c.Params("taskid"))
+		id := c.Query("id")
+		testrun, err := dao.TestrunDao().GetById(id)
+		if err != nil {
+			return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{
+				"error": err.Error(),
+			})
+		}
+
+		if testrun.Labid != labId || testrun.Taskid != taskId {
+			return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{
+				"error": "Run id does not match with lab id or task id",
+			})
+		}
+
+		return c.JSON(testrun)
 	})
 
 	adapter := fiberadapter.New(app)
