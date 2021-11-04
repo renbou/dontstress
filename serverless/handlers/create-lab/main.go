@@ -8,6 +8,7 @@ import (
 	"github.com/renbou/aws-lambda-go-api-proxy/fiber"
 	"github.com/renbou/dontstress/serverless/handlers/dao"
 	"github.com/renbou/dontstress/serverless/handlers/models"
+	"github.com/renbou/dontstress/serverless/handlers/utils"
 	_ "io/ioutil"
 	_ "mime/multipart"
 	_ "os"
@@ -32,6 +33,8 @@ func handler(request events.APIGatewayV2HTTPRequest) (events.APIGatewayV2HTTPRes
 				"error": err.Error(),
 			})
 		}
+		id := utils.GetId()
+		lab.Id = id
 		return c.JSON(lab)
 	})
 
