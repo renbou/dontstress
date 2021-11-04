@@ -7,7 +7,7 @@ import (
 	"github.com/aws/aws-lambda-go/lambda"
 	"github.com/gofiber/fiber/v2"
 	"github.com/renbou/aws-lambda-go-api-proxy/fiber"
-	"github.com/renbou/dontstress/lambda-api/handlers/dao"
+	"github.com/renbou/dontstress/internal/dao"
 )
 
 func handler(request events.APIGatewayV2HTTPRequest) (events.APIGatewayV2HTTPResponse, error) {

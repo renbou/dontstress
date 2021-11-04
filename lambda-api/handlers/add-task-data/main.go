@@ -11,9 +11,9 @@ import (
 	_ "github.com/go-playground/validator"
 	"github.com/gofiber/fiber/v2"
 	"github.com/renbou/aws-lambda-go-api-proxy/fiber"
-	"github.com/renbou/dontstress/lambda-api/handlers/dao"
-	"github.com/renbou/dontstress/lambda-api/handlers/dao/S3"
-	"github.com/renbou/dontstress/lambda-api/handlers/models"
+	"github.com/renbou/dontstress/internal/dao"
+	"github.com/renbou/dontstress/internal/dao/S3"
+	"github.com/renbou/dontstress/internal/models"
 )
 
 type payload struct {

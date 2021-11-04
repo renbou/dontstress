@@ -1,8 +1,8 @@
 package dao
 
 import (
-	"github.com/renbou/dontstress/lambda-api/handlers/dao/dynamodb"
-	"github.com/renbou/dontstress/lambda-api/handlers/dao/interfaces"
+	"github.com/renbou/dontstress/internal/dao/dynamodb"
+	"github.com/renbou/dontstress/internal/dao/interfaces"
 )
 
 func FileDao() interfaces.FileDao {

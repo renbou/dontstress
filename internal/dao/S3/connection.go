@@ -4,7 +4,7 @@ import (
 	"bytes"
 	"os"
 
-	"github.com/renbou/dontstress/lambda-api/handlers/utils"
+	"github.com/renbou/dontstress/internal/utils"
 
 	"github.com/aws/aws-sdk-go/aws"
 	"github.com/aws/aws-sdk-go/aws/session"

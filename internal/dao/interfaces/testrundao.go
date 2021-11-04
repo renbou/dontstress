@@ -1,6 +1,6 @@
 package interfaces
 
-import "github.com/renbou/dontstress/lambda-api/handlers/models"
+import "github.com/renbou/dontstress/internal/models"
 
 type TestrunDao interface {
 	Create(testrun *models.Run) error

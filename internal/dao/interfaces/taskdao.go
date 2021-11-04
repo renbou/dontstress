@@ -1,6 +1,6 @@
 package interfaces
 
-import "github.com/renbou/dontstress/lambda-api/handlers/models"
+import "github.com/renbou/dontstress/internal/models"
 
 type TaskDao interface {
 	Create(task *models.Task) error

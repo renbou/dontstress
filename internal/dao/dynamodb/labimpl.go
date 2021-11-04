@@ -1,7 +1,7 @@
 package dynamodb
 
 import (
-	"github.com/renbou/dontstress/lambda-api/handlers/models"
+	"github.com/renbou/dontstress/internal/models"
 )
 
 type LabImpl struct {
