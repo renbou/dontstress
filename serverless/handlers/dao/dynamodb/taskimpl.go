@@ -7,19 +7,19 @@ import (
 type TaskImpl struct {
 }
 
-func (dao TaskImpl) Create(task models.Task) error {
+func (dao *TaskImpl) Create(task *models.Task) error {
 	db := getDB()
 	table := db.Table(TasksDynamoName)
 	return table.Put(task).Run()
 }
 
-func (dao TaskImpl) Delete(task models.Task) error {
+func (dao *TaskImpl) Delete(task *models.Task) error {
 	db := getDB()
 	table := db.Table(TasksDynamoName)
 	return table.Delete("labid", task.LabId).Range("num", task.Num).Run()
 }
 
-func (dao TaskImpl) Update(task *models.Task) error {
+func (dao *TaskImpl) Update(task *models.Task) error {
 	db := getDB()
 	table := db.Table(TasksDynamoName)
 	update := table.Update("labid", task.LabId).Range("num", task.Num)
@@ -32,7 +32,7 @@ func (dao TaskImpl) Update(task *models.Task) error {
 	return update.Run()
 }
 
-func (dao TaskImpl) GetAll(labId string) ([]models.Task, error) {
+func (dao *TaskImpl) GetAll(labId string) ([]models.Task, error) {
 	db := getDB()
 	table := db.Table(TasksDynamoName)
 	var results []models.Task

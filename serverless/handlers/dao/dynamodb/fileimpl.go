@@ -7,14 +7,14 @@ import (
 type FileImpl struct {
 }
 
-func (dao FileImpl) Create(file models.File) error {
+func (dao *FileImpl) Create(file *models.File) error {
 	db := getDB()
 	table := db.Table(FilesDynamoName)
 	return table.Put(file).Run()
 }
 
-//func (dao FileImpl) Delete(file models.File) error {
-//	db := getDB()
-//	table := db.Table(LabsDynamoName)
-//	return table.Delete("labid", lab.Id).Run()
-//}
+func (dao *FileImpl) Delete(file *models.File) error {
+	db := getDB()
+	table := db.Table(FilesDynamoName)
+	return table.Delete("id", file.Id).Run()
+}

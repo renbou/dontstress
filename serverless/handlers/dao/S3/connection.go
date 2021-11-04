@@ -2,11 +2,12 @@ package S3
 
 import (
 	"bytes"
+	"os"
+
 	"github.com/aws/aws-sdk-go/aws"
 	"github.com/aws/aws-sdk-go/aws/session"
 	"github.com/aws/aws-sdk-go/service/s3"
 	"github.com/google/uuid"
-	"os"
 )
 
 const (
