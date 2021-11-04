@@ -67,3 +67,9 @@ interface TestRunsEntry {
     };
   }[];
 }
+
+// Table "Admins"
+interface AdminsEntry {
+  // Simple primary key
+  id: string;
+}
