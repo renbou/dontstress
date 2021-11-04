@@ -13,6 +13,8 @@ interface TasksEntry {
   num: number;
   // Attributes
   name: string;
+  validator: string;
+  generator: string;
 }
 
 enum Languages {
@@ -43,6 +45,7 @@ enum TestResult {
   ML = "ML",
   RE = "RE",
   CE = "CE",
+  PE = "PE",
 }
 
 // Table "TestRuns"
@@ -53,12 +56,11 @@ interface TestRunsEntry {
   status: TaskStatus;
   tests: {
     result: TestResult;
-    info:
-      | string
-      | {
-          test: string;
-          expected: string;
-          got: string;
-        };
+    message?: string;
+    info?: {
+      test: string;
+      expected: string;
+      got: string;
+    };
   }[];
 }
