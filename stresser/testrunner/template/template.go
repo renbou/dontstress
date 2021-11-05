@@ -1,11 +1,9 @@
-package util
+package template
 
 import (
 	"strings"
 	"text/template"
 )
-
-type KV map[string]string
 
 func Format(fmt string, data interface{}) (string, error) {
 	tmpl := template.New("")
