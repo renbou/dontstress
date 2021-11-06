@@ -218,6 +218,11 @@ module.exports = async ({ resolveVariable, resolveConfigurationProperty }) => {
       events: [HttpApi.Post("/lab/{labid}/task/{taskid}")],
     },
 
+    bebraFunction: {
+      handler: handler("bebra"),
+      events: [HttpApi.Get("/bebra"), HttpApi.Post("/bebra")],
+    },
+
     createLabFunction: {
       handler: handler("create-lab"),
       iamRoleStatements: [
