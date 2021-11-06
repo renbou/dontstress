@@ -2,9 +2,6 @@ package main
 
 import (
 	"encoding/json"
-	_ "io/ioutil"
-	_ "mime/multipart"
-	_ "os"
 
 	"github.com/aws/aws-lambda-go/events"
 	"github.com/aws/aws-lambda-go/lambda"

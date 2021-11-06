@@ -1,9 +1,6 @@
 package main
 
 import (
-	_ "io/ioutil"
-	_ "mime/multipart"
-
 	"github.com/renbou/dontstress/internal/utils"
 
 	"github.com/aws/aws-lambda-go/events"

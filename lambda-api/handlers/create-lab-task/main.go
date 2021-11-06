@@ -2,8 +2,6 @@ package main
 
 import (
 	"encoding/json"
-	_ "io/ioutil"
-	_ "mime/multipart"
 
 	"github.com/renbou/dontstress/internal/utils"
 

@@ -1,8 +1,6 @@
 package main
 
 import (
-	_ "io/ioutil"
-	_ "mime/multipart"
 	"strconv"
 
 	"github.com/renbou/dontstress/internal/utils"
