@@ -1,28 +1,30 @@
 package main
 
 import (
-	_ "io/ioutil"
-	_ "mime/multipart"
-
-	"github.com/renbou/dontstress/internal/utils"
+	"encoding/json"
 
 	"github.com/aws/aws-lambda-go/events"
 	"github.com/aws/aws-lambda-go/lambda"
 	"github.com/gofiber/fiber/v2"
 	fiberadapter "github.com/renbou/aws-lambda-go-api-proxy/fiber"
-	"github.com/renbou/dontstress/internal/dao"
 )
 
 func handler(request events.APIGatewayV2HTTPRequest) (events.APIGatewayV2HTTPResponse, error) {
 	app := fiber.New()
 
-	app.Get("/lab/:labid/tasks", func(c *fiber.Ctx) error {
-		labId := c.Params("labid")
-		tasks, err := dao.TaskDao().GetAll(labId)
-		if ok := utils.Check(c, err); !ok {
-			return err
-		}
-		return c.JSON(tasks)
+	app.Get("/bebra", func(c *fiber.Ctx) error {
+		return c.JSON(fiber.Map{
+			"бебра": "понюхана",
+		})
+	})
+
+	app.Post("/bebra", func(c *fiber.Ctx) error {
+		var bebra map[string]string
+		json.Unmarshal(c.Body(), &bebra)
+
+		return c.JSON(fiber.Map{
+			"получена бебра": bebra,
+		})
 	})
 
 	adapter := fiberadapter.New(app)

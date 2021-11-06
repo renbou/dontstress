@@ -23,6 +23,29 @@ Resources:
       ContentUri: ../lambda-api/static/
       Description: Supported languages
 
+  AddTaskDataFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: ../lambda-api/handlers/add-task-data/
+      Handler: add-task-data
+      Runtime: go1.x
+      Architectures:
+        - x86_64
+      Tracing: Active
+      Policies:
+        - S3CrudPolicy:
+            BucketName: !Ref FilesBucket
+        - DynamoDBCrudPolicy:
+            TableName: dont-stress-tasks-table
+        - DynamoDBCrudPolicy:
+            TableName: dont-stress-files-table
+      Events:
+        CatchAll:
+          Type: HttpApi
+          Properties:
+            Path: /lab/{labid}/task/{taskid}
+            Method: Post
+
   CreateLabFunction:
     Type: AWS::Serverless::Function
     Properties:
@@ -44,24 +67,24 @@ Resources:
       Layers:
         - !Ref LangsStatic
 
-  GetLabsFunction:
+  CreateTaskFunction:
     Type: AWS::Serverless::Function
     Properties:
-      CodeUri: ../lambda-api/handlers/get-labs/
-      Handler: get-labs
+      CodeUri: ../lambda-api/handlers/create-lab-task/
+      Handler: create-lab-task
       Runtime: go1.x
       Architectures:
         - x86_64
       Tracing: Active
       Policies:
         - DynamoDBCrudPolicy:
-            TableName: dont-stress-labs-table
+            TableName: dont-stress-tasks-table
       Events:
         CatchAll:
           Type: HttpApi
           Properties:
-            Path: /labs
-            Method: Get
+            Path: /lab/{labid}/tasks
+            Method: Post
 
   DeleteLabFunction:
     Type: AWS::Serverless::Function
@@ -82,60 +105,6 @@ Resources:
             Path: /lab/{labid}
             Method: Delete
 
-  CreateTaskFunction:
-    Type: AWS::Serverless::Function
-    Properties:
-      CodeUri: ../lambda-api/handlers/create-lab-task/
-      Handler: create-lab-task
-      Runtime: go1.x
-      Architectures:
-        - x86_64
-      Tracing: Active
-      Policies:
-        - DynamoDBCrudPolicy:
-            TableName: dont-stress-tasks-table
-      Events:
-        CatchAll:
-          Type: HttpApi
-          Properties:
-            Path: /lab/{labid}/tasks
-            Method: Post
-
-  GetLabTasksFunction:
-    Type: AWS::Serverless::Function
-    Properties:
-      CodeUri: ../lambda-api/handlers/get-lab-tasks/
-      Handler: get-lab-tasks
-      Runtime: go1.x
-      Architectures:
-        - x86_64
-      Tracing: Active
-      Events:
-        CatchAll:
-          Type: HttpApi
-          Properties:
-            Path: /lab/{labid}/tasks
-            Method: Get
-
-  AddTaskDataFunction:
-    Type: AWS::Serverless::Function
-    Properties:
-      CodeUri: ../lambda-api/handlers/add-task-data/
-      Handler: add-task-data
-      Runtime: go1.x
-      Architectures:
-        - x86_64
-      Tracing: Active
-      Policies:
-        - DynamoDBCrudPolicy:
-            TableName: dont-stress-tasks-table
-      Events:
-        CatchAll:
-          Type: HttpApi
-          Properties:
-            Path: /lab/{labid}/task/{taskid}
-            Method: Post
-
   DeleteTaskFunction:
     Type: AWS::Serverless::Function
     Properties:
@@ -155,6 +124,44 @@ Resources:
             Path: /lab/{labid}/task/{taskid}
             Method: Delete
 
+  GetLabTasksFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: ../lambda-api/handlers/get-lab-tasks/
+      Handler: get-lab-tasks
+      Runtime: go1.x
+      Architectures:
+        - x86_64
+      Tracing: Active
+      Policies:
+        - DynamoDBCrudPolicy:
+            TableName: dont-stress-tasks-table
+      Events:
+        CatchAll:
+          Type: HttpApi
+          Properties:
+            Path: /lab/{labid}/tasks
+            Method: Get
+
+  GetLabsFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: ../lambda-api/handlers/get-labs/
+      Handler: get-labs
+      Runtime: go1.x
+      Architectures:
+        - x86_64
+      Tracing: Active
+      Policies:
+        - DynamoDBCrudPolicy:
+            TableName: dont-stress-labs-table
+      Events:
+        CatchAll:
+          Type: HttpApi
+          Properties:
+            Path: /labs
+            Method: Get
+
   PollTaskTestFunction:
     Type: AWS::Serverless::Function
     Properties:
@@ -166,7 +173,7 @@ Resources:
       Tracing: Active
       Policies:
         - DynamoDBCrudPolicy:
-            TableName: dont-stress-tasks-table
+            TableName: dont-stress-testruns-table
       Events:
         CatchAll:
           Type: HttpApi
@@ -184,8 +191,12 @@ Resources:
         - x86_64
       Tracing: Active
       Policies:
+        - S3CrudPolicy:
+              BucketName: !Ref FilesBucket
         - DynamoDBCrudPolicy:
-            TableName: dont-stress-tasks-table
+            TableName: dont-stress-files-table
+        - DynamoDBCrudPolicy:
+            TableName: dont-stress-testruns-table
       Events:
         CatchAll:
           Type: HttpApi

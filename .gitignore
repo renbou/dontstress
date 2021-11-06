@@ -19,5 +19,7 @@
 .DS_Store
 
 serverless/.aws-sam/
-
 serverless/y
+.serverless
+.bin
+node_modules
