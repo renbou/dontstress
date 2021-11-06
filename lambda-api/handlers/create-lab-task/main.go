@@ -25,16 +25,23 @@ func handler(request events.APIGatewayV2HTTPRequest) (events.APIGatewayV2HTTPRes
 		if ok := utils.Check(c, err); !ok {
 			return err
 		}
+
+		if ok := utils.Validate(c, task); !ok {
+			return err
+		}
+
 		task.LabId = c.Params("labid")
 		count, err := dao.TaskDao().GetCount(task.LabId)
 		if ok := utils.Check(c, err); !ok {
 			return err
 		}
+
 		task.Num = count
 		err = dao.TaskDao().Create(&task)
 		if ok := utils.Check(c, err); !ok {
 			return err
 		}
+
 		return c.JSON(task.ToDTO())
 	})
 

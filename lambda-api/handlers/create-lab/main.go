@@ -21,6 +21,11 @@ func handler(request events.APIGatewayV2HTTPRequest) (events.APIGatewayV2HTTPRes
 	app.Post("/labs", func(c *fiber.Ctx) error {
 		var lab models.Lab
 		err := json.Unmarshal(c.Body(), &lab)
+
+		if ok := utils.Validate(c, lab); !ok {
+			return err
+		}
+
 		if ok := utils.Check(c, err); !ok {
 			return err
 		}

@@ -17,11 +17,11 @@ import (
 )
 
 type payload struct {
-	Filetype string `json:"type"`
+	Filetype string `json:"type" validate:"required"`
 	File     struct {
-		Lang string `json:"lang"`
-		Data string `json:"data"`
-	} `json:"file"`
+		Lang string `json:"lang" validate:"required"`
+		Data string `json:"data" validate:"required"`
+	} `json:"file" validate:"required"`
 }
 
 func handler(request events.APIGatewayV2HTTPRequest) (events.APIGatewayV2HTTPResponse, error) {
@@ -39,6 +39,10 @@ func handler(request events.APIGatewayV2HTTPRequest) (events.APIGatewayV2HTTPRes
 
 		var payload payload
 		err = json.Unmarshal(c.Body(), &payload)
+
+		if ok := utils.Validate(c, payload); !ok {
+			return err
+		}
 
 		if ok := utils.Check(c, err); !ok {
 			return err
