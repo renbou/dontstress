@@ -2,6 +2,7 @@ package main
 
 import (
 	"encoding/json"
+	"github.com/renbou/dontstress/lambda-api/auth"
 	"strconv"
 
 	"github.com/renbou/dontstress/internal/utils"
@@ -25,6 +26,8 @@ type payload struct {
 
 func handler(request events.APIGatewayV2HTTPRequest) (events.APIGatewayV2HTTPResponse, error) {
 	app := fiber.New()
+
+	app.Use(auth.New())
 
 	app.Post("/lab/:labid/task/:taskid", func(c *fiber.Ctx) error {
 		labId := c.Params("labid")

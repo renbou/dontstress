@@ -48,3 +48,14 @@ Resources:
         - AttributeName: id
           KeyType: HASH
       BillingMode: ${self:custom.tableBillingMode}
+  adminsTable:
+    Type: AWS::DynamoDB::Table
+    Properties:
+      TableName: ${self:custom.prefix}-admins-table
+      AttributeDefinitions:
+        - AttributeName: id
+          AttributeType: S
+      KeySchema:
+        - AttributeName: id
+          KeyType: HASH
+      BillingMode: ${self:custom.tableBillingMode}

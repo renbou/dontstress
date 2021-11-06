@@ -2,6 +2,7 @@ package main
 
 import (
 	"encoding/json"
+	"github.com/renbou/dontstress/lambda-api/auth"
 
 	"github.com/aws/aws-lambda-go/events"
 	"github.com/aws/aws-lambda-go/lambda"
@@ -14,6 +15,8 @@ import (
 
 func handler(request events.APIGatewayV2HTTPRequest) (events.APIGatewayV2HTTPResponse, error) {
 	app := fiber.New()
+
+	app.Use(auth.New())
 
 	app.Post("/labs", func(c *fiber.Ctx) error {
 		var lab models.Lab

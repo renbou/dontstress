@@ -211,6 +211,7 @@ module.exports = async ({ resolveVariable, resolveConfigurationProperty }) => {
     addTaskDataFunction: {
       handler: handler("add-task-data"),
       iamRoleStatements: [
+        sls.Resource("adminsTable").Policy(Actions.DynamoDBRead),
         sls.Resource("tasksTable").Policy(Actions.DynamoDBCrud),
         sls.Resource("filesTable").Policy(Actions.DynamoDBCrud),
         sls.Resources("filesBucket", "filesBucket/*").Policy(Actions.S3Crud),
@@ -226,6 +227,7 @@ module.exports = async ({ resolveVariable, resolveConfigurationProperty }) => {
     createLabFunction: {
       handler: handler("create-lab"),
       iamRoleStatements: [
+        sls.Resource("adminsTable").Policy(Actions.DynamoDBRead),
         sls.Resource("labsTable").Policy(Actions.DynamoDBCrud),
       ],
       events: [HttpApi.Post("/labs")],
@@ -234,6 +236,7 @@ module.exports = async ({ resolveVariable, resolveConfigurationProperty }) => {
     createTaskFunction: {
       handler: handler("create-lab-task"),
       iamRoleStatements: [
+        sls.Resource("adminsTable").Policy(Actions.DynamoDBRead),
         sls.Resource("tasksTable").Policy(Actions.DynamoDBCrud),
         sls.Resource("labsTable").Policy(Actions.DynamoDBRead),
       ],
@@ -243,6 +246,7 @@ module.exports = async ({ resolveVariable, resolveConfigurationProperty }) => {
     deleteLabFunction: {
       handler: handler("delete-lab"),
       iamRoleStatements: [
+        sls.Resource("adminsTable").Policy(Actions.DynamoDBRead),
         sls.Resource("labsTable").Policy(Actions.DynamoDBCrud),
       ],
       events: [HttpApi.Delete("/lab/{labid}")],
@@ -251,6 +255,7 @@ module.exports = async ({ resolveVariable, resolveConfigurationProperty }) => {
     deleteTaskFunction: {
       handler: handler("delete-task"),
       iamRoleStatements: [
+        sls.Resource("adminsTable").Policy(Actions.DynamoDBRead),
         sls.Resource("tasksTable").Policy(Actions.DynamoDBCrud),
       ],
       events: [HttpApi.Delete("/lab/{labid}/task/{taskid}")],
