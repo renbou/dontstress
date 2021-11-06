@@ -65,7 +65,10 @@ func handler(request events.APIGatewayV2HTTPRequest) (events.APIGatewayV2HTTPRes
 			return err
 		}
 
-		return c.JSON(file)
+		return c.JSON(fiber.Map{
+			"type": payload.Filetype,
+			"file": file.ToDTO(payload.File.Data),
+		})
 	})
 
 	adapter := fiberadapter.New(app)

@@ -1,6 +1,7 @@
 package main
 
 import (
+	"github.com/renbou/dontstress/internal/dto"
 	_ "io/ioutil"
 	_ "mime/multipart"
 
@@ -22,7 +23,12 @@ func handler(request events.APIGatewayV2HTTPRequest) (events.APIGatewayV2HTTPRes
 		if ok := utils.Check(c, err); !ok {
 			return err
 		}
-		return c.JSON(tasks)
+
+		var taskdtos []dto.TaskDTO
+		for _, task := range tasks {
+			taskdtos = append(taskdtos, *task.ToDTO())
+		}
+		return c.JSON(taskdtos)
 	})
 
 	adapter := fiberadapter.New(app)

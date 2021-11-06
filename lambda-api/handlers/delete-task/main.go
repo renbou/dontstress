@@ -30,7 +30,8 @@ func handler(request events.APIGatewayV2HTTPRequest) (events.APIGatewayV2HTTPRes
 		if ok := utils.Check(c, err); !ok {
 			return err
 		}
-		return c.Status(fiber.StatusOK).JSON(fiber.Map{})
+		c.Status(fiber.StatusOK)
+		return nil
 	})
 
 	adapter := fiberadapter.New(app)

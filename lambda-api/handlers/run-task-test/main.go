@@ -62,7 +62,7 @@ func handler(request events.APIGatewayV2HTTPRequest) (events.APIGatewayV2HTTPRes
 			return err
 		}
 
-		return c.JSON(testrun)
+		return c.JSON(testrun.Id)
 	})
 
 	adapter := fiberadapter.New(app)

@@ -30,7 +30,7 @@ func handler(request events.APIGatewayV2HTTPRequest) (events.APIGatewayV2HTTPRes
 			})
 		}
 
-		return c.JSON(testrun)
+		return c.JSON(testrun.ToDTO())
 	})
 
 	adapter := fiberadapter.New(app)
