@@ -1,0 +1,6 @@
+# s3 buckets
+Resources:
+  filesBucket:
+    Type: AWS::S3::Bucket
+    Properties:
+      BucketName: ${self:custom.prefix}-files-bucket
