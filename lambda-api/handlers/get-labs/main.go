@@ -4,7 +4,7 @@ import (
 	"github.com/aws/aws-lambda-go/events"
 	"github.com/aws/aws-lambda-go/lambda"
 	"github.com/gofiber/fiber/v2"
-	"github.com/renbou/aws-lambda-go-api-proxy/fiber"
+	fiberadapter "github.com/renbou/aws-lambda-go-api-proxy/fiber"
 	"github.com/renbou/dontstress/internal/dao"
 	"github.com/renbou/dontstress/internal/utils"
 )
@@ -14,7 +14,7 @@ func handler(request events.APIGatewayV2HTTPRequest) (events.APIGatewayV2HTTPRes
 
 	app.Get("/labs", func(c *fiber.Ctx) error {
 		labs, err := dao.LabDao().GetAll()
-		if err = utils.Check(c, err); err != nil {
+		if ok := utils.Check(c, err); !ok {
 			return err
 		}
 		return c.JSON(labs)

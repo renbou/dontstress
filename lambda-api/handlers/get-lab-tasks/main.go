@@ -1,14 +1,15 @@
 package main
 
 import (
-	"github.com/renbou/dontstress/internal/utils"
 	_ "io/ioutil"
 	_ "mime/multipart"
+
+	"github.com/renbou/dontstress/internal/utils"
 
 	"github.com/aws/aws-lambda-go/events"
 	"github.com/aws/aws-lambda-go/lambda"
 	"github.com/gofiber/fiber/v2"
-	"github.com/renbou/aws-lambda-go-api-proxy/fiber"
+	fiberadapter "github.com/renbou/aws-lambda-go-api-proxy/fiber"
 	"github.com/renbou/dontstress/internal/dao"
 )
 
@@ -18,7 +19,7 @@ func handler(request events.APIGatewayV2HTTPRequest) (events.APIGatewayV2HTTPRes
 	app.Get("/lab/:labid/tasks", func(c *fiber.Ctx) error {
 		labId := c.Params("labid")
 		tasks, err := dao.TaskDao().GetAll(labId)
-		if err = utils.Check(c, err); err != nil {
+		if ok := utils.Check(c, err); !ok {
 			return err
 		}
 		return c.JSON(tasks)

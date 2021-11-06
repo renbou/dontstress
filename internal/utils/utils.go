@@ -9,11 +9,12 @@ func GetId() string {
 	return uuid.New().String()
 }
 
-func Check(c *fiber.Ctx, err error) error {
+func Check(c *fiber.Ctx, err error) bool {
 	if err != nil {
-		return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{
+		c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{
 			"error": err.Error(),
 		})
+		return false
 	}
-	return nil
+	return true
 }

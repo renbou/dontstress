@@ -2,23 +2,21 @@ package main
 
 import (
 	"encoding/json"
-	"github.com/renbou/dontstress/internal/utils"
-	_ "io/ioutil"
-	_ "mime/multipart"
 	"strconv"
+
+	"github.com/renbou/dontstress/internal/utils"
 
 	"github.com/aws/aws-lambda-go/events"
 	"github.com/aws/aws-lambda-go/lambda"
-	_ "github.com/go-playground/validator"
 	"github.com/gofiber/fiber/v2"
-	"github.com/renbou/aws-lambda-go-api-proxy/fiber"
+	fiberadapter "github.com/renbou/aws-lambda-go-api-proxy/fiber"
 	"github.com/renbou/dontstress/internal/dao"
 	"github.com/renbou/dontstress/internal/dao/S3"
 	"github.com/renbou/dontstress/internal/models"
 )
 
 type payload struct {
-	Filetype string `json:"filetype"`
+	Filetype string `json:"type"`
 	File     struct {
 		Lang string `json:"lang"`
 		Data string `json:"data"`
@@ -32,26 +30,26 @@ func handler(request events.APIGatewayV2HTTPRequest) (events.APIGatewayV2HTTPRes
 		labId := c.Params("labid")
 		taskId, err := strconv.Atoi(c.Params("taskid"))
 
-		if err = utils.Check(c, err); err != nil {
+		if ok := utils.Check(c, err); !ok {
 			return err
 		}
 
 		var payload payload
 		err = json.Unmarshal(c.Body(), &payload)
 
-		if err = utils.Check(c, err); err != nil {
+		if ok := utils.Check(c, err); !ok {
 			return err
 		}
 
 		id, err := S3.UploadFile(payload.File.Data)
-		if err = utils.Check(c, err); err != nil {
+		if ok := utils.Check(c, err); !ok {
 			return err
 		}
 
 		file := models.File{Id: id, Lang: payload.File.Lang}
 
 		err = dao.FileDao().Create(&file)
-		if err = utils.Check(c, err); err != nil {
+		if ok := utils.Check(c, err); !ok {
 			return err
 		}
 
@@ -63,7 +61,7 @@ func handler(request events.APIGatewayV2HTTPRequest) (events.APIGatewayV2HTTPRes
 		}
 
 		err = dao.TaskDao().Update(&task)
-		if err = utils.Check(c, err); err != nil {
+		if ok := utils.Check(c, err); !ok {
 			return err
 		}
 

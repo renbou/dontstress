@@ -1,7 +1,7 @@
 package models
 
 type Task struct {
-	LabId     string `dynamo:"labid" json:"lab_id"`
+	LabId     string `dynamo:"labid" json:"labid"`
 	Num       int    `dynamo:"num" json:"num"`
 	Name      string `dynamo:"name" json:"name"`
 	Validator string `dynamo:"validator" json:"validator"`
