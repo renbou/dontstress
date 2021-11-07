@@ -8,9 +8,11 @@ variablesResolutionMode: "20210326"
 
 plugins:
   - serverless-iam-roles-per-function
-  - serverless-go-plugin
+  - serverless-go
 
 custom:
+  go:
+    baseDir: ..
   tableBillingMode: PAY_PER_REQUEST
   prefix: ${self:service}-${sls:stage}
 
@@ -22,7 +24,7 @@ provider:
   logRetentionInDays: 7
   # Global lambda runtime config
   timeout: 5
-  runtime: go1.x
+  runtime: go
   memorySize: 128
   architecture: x86_64
   environment:
@@ -33,8 +35,8 @@ provider:
     RUNS_TABLE_NAME: !Ref testRunsTable
     BUCKET_NAME: !Ref filesBucket
 
-functions: ${file(./functions.js)}
+functions: ${file(deploy/functions.js)}
 
 resources:
-  - ${file(tables.yaml)}
-  - ${file(buckets.yaml)}
+  - ${file(deploy/tables.yaml)}
+  - ${file(deploy/buckets.yaml)}
