@@ -21,11 +21,11 @@ func handler(request events.APIGatewayV2HTTPRequest) (events.APIGatewayV2HTTPRes
 			return err
 		}
 
-		var taskdtos []dto.TaskDTO
+		var taskDtos []dto.TaskDTO
 		for _, task := range tasks {
-			taskdtos = append(taskdtos, *task.ToDTO())
+			taskDtos = append(taskDtos, *task.ToDTO())
 		}
-		return c.JSON(taskdtos)
+		return c.JSON(taskDtos)
 	})
 
 	adapter := fiberadapter.New(app)

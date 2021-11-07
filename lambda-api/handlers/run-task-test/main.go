@@ -53,20 +53,20 @@ func handler(request events.APIGatewayV2HTTPRequest) (events.APIGatewayV2HTTPRes
 			return err
 		}
 
-		testrun := models.Run{
+		testRun := models.Run{
 			Id:     utils.GetId(),
-			Labid:  labId,
-			Taskid: taskId,
-			Fileid: id,
+			LabId:  labId,
+			TaskId: taskId,
+			FileId: id,
 			Status: "QUEUE",
 		}
 
-		err = dao.TestrunDao().Create(&testrun)
+		err = dao.TestrunDao().Create(&testRun)
 		if ok := utils.Check(c, err); !ok {
 			return err
 		}
 
-		return c.JSON(testrun.Id)
+		return c.JSON(testRun.Id)
 	})
 
 	adapter := fiberadapter.New(app)

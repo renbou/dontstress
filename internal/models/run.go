@@ -4,9 +4,9 @@ import "github.com/renbou/dontstress/internal/dto"
 
 type Run struct {
 	Id     string `dynamo:"id" json:"id"`
-	Labid  string `dynamo:"labid" json:"labid"`
-	Taskid int    `dynamo:"taskid" json:"taskid"`
-	Fileid string `dynamo:"fileid" json:"fileid"`
+	LabId  string `dynamo:"labid" json:"labid"`
+	TaskId int    `dynamo:"taskid" json:"taskid"`
+	FileId string `dynamo:"fileid" json:"fileid"`
 	Status string `dynamo:"status" json:"status"`
 	Tests  []struct {
 		Result  string `dynamo:"results" json:"result"`

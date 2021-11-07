@@ -19,18 +19,18 @@ func handler(request events.APIGatewayV2HTTPRequest) (events.APIGatewayV2HTTPRes
 		labId := c.Params("labid")
 		taskId, err := strconv.Atoi(c.Params("taskid"))
 		id := c.Query("id")
-		testrun, err := dao.TestrunDao().GetById(id)
+		testRun, err := dao.TestrunDao().GetById(id)
 		if ok := utils.Check(c, err); !ok {
 			return err
 		}
 
-		if testrun.Labid != labId || testrun.Taskid != taskId {
+		if testRun.LabId != labId || testRun.TaskId != taskId {
 			return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{
 				"error": "Run id does not match with lab id or task id",
 			})
 		}
 
-		return c.JSON(testrun.ToDTO())
+		return c.JSON(testRun.ToDTO())
 	})
 
 	adapter := fiberadapter.New(app)

@@ -19,11 +19,11 @@ func handler(request events.APIGatewayV2HTTPRequest) (events.APIGatewayV2HTTPRes
 			return err
 		}
 
-		var labdtos []dto.LabDTO
+		var labDtos []dto.LabDTO
 		for _, lab := range labs {
-			labdtos = append(labdtos, *lab.ToDTO())
+			labDtos = append(labDtos, *lab.ToDTO())
 		}
-		return c.JSON(labdtos)
+		return c.JSON(labDtos)
 	})
 
 	adapter := fiberadapter.New(app)
