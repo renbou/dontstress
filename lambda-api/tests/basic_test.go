@@ -234,3 +234,41 @@ func Test_CreateLabThenCreateTaskThenDeleteBoth(t *testing.T) {
 	err = json.Unmarshal(body, &labs)
 	assert.Equal(t, false, labExists(labs, labid))
 }
+
+func Test_LangValidationUnsupported(t *testing.T) {
+	postBody, _ := json.Marshal(map[string]string{
+		"lang": "bebra++",
+		"data": "bebra main(){ return bebra; }",
+	})
+	println(baseUrl + "/lab/" + defaultLabId + "/task/" + defaultTaskId + "/test")
+	response, err := http.Post(baseUrl+"/lab/"+defaultLabId+"/task/"+defaultTaskId+"/test", contentType, bytes.NewBuffer(postBody))
+	if err != nil {
+		log.Fatalln(err)
+	}
+	assert.Equal(t, "400 Bad Request", response.Status)
+	body, err := ioutil.ReadAll(response.Body)
+	if err != nil {
+		log.Fatalln(err)
+	}
+	var payload struct {
+		Message string `json:"message"`
+	}
+	err = json.Unmarshal(body, &payload)
+	assert.Equal(t, nil, err)
+	assert.Equal(t, "Unsupported language", payload.Message)
+}
+
+// This test uploads file to S3 bucket. There is no endpoint for deleting or auto delete,
+// so don't use it until automatic deletion is not implemented.
+
+//func Test_LangValidationSupported(t *testing.T) {
+//	postBody, _ := json.Marshal(map[string]string{
+//		"lang": "G++",
+//		"data": "int main(){ return 0; }",
+//	})
+//	response, err := http.Post(baseUrl+"/lab/"+defaultLabId+"/task/"+defaultTaskId+"/test", contentType, bytes.NewBuffer(postBody))
+//	if err != nil {
+//		log.Fatalln(err)
+//	}
+//	assert.Equal(t, "200 OK", response.Status)
+//}

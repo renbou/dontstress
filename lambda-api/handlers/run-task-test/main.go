@@ -40,6 +40,12 @@ func initApp() {
 			return err
 		}
 
+		if !utils.ValidLang(payload.Lang) {
+			return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{
+				"message": "Unsupported language",
+			})
+		}
+
 		id, err := S3.UploadFile(payload.Data)
 		if ok := utils.Check(c, err); !ok {
 			return err
