@@ -16,6 +16,9 @@ custom:
   tableBillingMode: PAY_PER_REQUEST
   prefix: ${self:service}-${sls:stage}
 
+package:
+  excludeDevDependencies: false
+
 provider:
   name: aws
   region: eu-west-1
