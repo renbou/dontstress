@@ -1,0 +1,2 @@
+# Runner
+Step Function + Lambdas to run a single test for a TaskRun entry. To be called with the test difficulty and TaskRunEntry id. This will download the generator, validator and program to test, and will run a single test, recording the results.
