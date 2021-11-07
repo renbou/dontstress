@@ -14,9 +14,10 @@ import (
 	"github.com/renbou/dontstress/internal/models"
 )
 
-func handler(request events.APIGatewayV2HTTPRequest) (events.APIGatewayV2HTTPResponse, error) {
-	app := fiber.New()
+var app = fiber.New()
+var adapter = fiberadapter.New(app)
 
+func initApp() {
 	app.Use(auth.New())
 
 	app.Delete("/lab/:labid/task/:taskid", func(c *fiber.Ctx) error {
@@ -34,9 +35,9 @@ func handler(request events.APIGatewayV2HTTPRequest) (events.APIGatewayV2HTTPRes
 		c.Status(fiber.StatusOK)
 		return nil
 	})
+}
 
-	adapter := fiberadapter.New(app)
-
+func handler(request events.APIGatewayV2HTTPRequest) (events.APIGatewayV2HTTPResponse, error) {
 	if resp, err := adapter.ProxyV2(request); err != nil {
 		return events.APIGatewayV2HTTPResponse{}, err
 	} else {
@@ -45,5 +46,6 @@ func handler(request events.APIGatewayV2HTTPRequest) (events.APIGatewayV2HTTPRes
 }
 
 func main() {
+	initApp()
 	lambda.Start(handler)
 }

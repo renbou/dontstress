@@ -10,9 +10,10 @@ import (
 	"github.com/renbou/dontstress/internal/utils"
 )
 
-func handler(request events.APIGatewayV2HTTPRequest) (events.APIGatewayV2HTTPResponse, error) {
-	app := fiber.New()
+var app = fiber.New()
+var adapter = fiberadapter.New(app)
 
+func initApp() {
 	app.Get("/labs", func(c *fiber.Ctx) error {
 		labs, err := dao.LabDao().GetAll()
 		if ok := utils.Check(c, err); !ok {
@@ -25,9 +26,9 @@ func handler(request events.APIGatewayV2HTTPRequest) (events.APIGatewayV2HTTPRes
 		}
 		return c.JSON(labDtos)
 	})
+}
 
-	adapter := fiberadapter.New(app)
-
+func handler(request events.APIGatewayV2HTTPRequest) (events.APIGatewayV2HTTPResponse, error) {
 	if resp, err := adapter.ProxyV2(request); err != nil {
 		return events.APIGatewayV2HTTPResponse{}, err
 	} else {
@@ -36,5 +37,6 @@ func handler(request events.APIGatewayV2HTTPRequest) (events.APIGatewayV2HTTPRes
 }
 
 func main() {
+	initApp()
 	lambda.Start(handler)
 }

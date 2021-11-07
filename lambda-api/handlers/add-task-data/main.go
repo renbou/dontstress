@@ -2,11 +2,6 @@ package main
 
 import (
 	"encoding/json"
-	"github.com/renbou/dontstress/lambda-api/auth"
-	"strconv"
-
-	"github.com/renbou/dontstress/internal/utils"
-
 	"github.com/aws/aws-lambda-go/events"
 	"github.com/aws/aws-lambda-go/lambda"
 	"github.com/gofiber/fiber/v2"
@@ -14,6 +9,9 @@ import (
 	"github.com/renbou/dontstress/internal/dao"
 	"github.com/renbou/dontstress/internal/dao/S3"
 	"github.com/renbou/dontstress/internal/models"
+	"github.com/renbou/dontstress/internal/utils"
+	"github.com/renbou/dontstress/lambda-api/auth"
+	"strconv"
 )
 
 type payload struct {
@@ -24,9 +22,10 @@ type payload struct {
 	} `json:"file" validate:"required"`
 }
 
-func handler(request events.APIGatewayV2HTTPRequest) (events.APIGatewayV2HTTPResponse, error) {
-	app := fiber.New()
+var app = fiber.New()
+var adapter = fiberadapter.New(app)
 
+func initApp() {
 	app.Use(auth.New())
 
 	app.Post("/lab/:labid/task/:taskid", func(c *fiber.Ctx) error {
@@ -77,9 +76,9 @@ func handler(request events.APIGatewayV2HTTPRequest) (events.APIGatewayV2HTTPRes
 			"file": file.ToDTO(payload.File.Data),
 		})
 	})
+}
 
-	adapter := fiberadapter.New(app)
-
+func handler(request events.APIGatewayV2HTTPRequest) (events.APIGatewayV2HTTPResponse, error) {
 	if resp, err := adapter.ProxyV2(request); err != nil {
 		return events.APIGatewayV2HTTPResponse{}, err
 	} else {
@@ -88,5 +87,6 @@ func handler(request events.APIGatewayV2HTTPRequest) (events.APIGatewayV2HTTPRes
 }
 
 func main() {
+	initApp()
 	lambda.Start(handler)
 }
