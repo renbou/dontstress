@@ -81,9 +81,9 @@ func Test_CreateLabThenDelete(t *testing.T) {
 	if err != nil {
 		log.Fatalln(err)
 	}
-	// labid is parsed with quotes here
-	labid := string(body)
-	labid = labid[1 : len(labid)-1]
+	var labid string
+	err = json.Unmarshal(body, &labid)
+	assert.Equal(t, nil, err)
 	assert.Equal(t, true, isValidUUID(labid))
 
 	// Check if lab exists in DynamoDB
@@ -140,9 +140,9 @@ func Test_CreateLabThenCreateTaskThenDeleteBoth(t *testing.T) {
 	if err != nil {
 		log.Fatalln(err)
 	}
-	// labid is parsed with quotes here
-	labid := string(body)
-	labid = labid[1 : len(labid)-1]
+	var labid string
+	err = json.Unmarshal(body, &labid)
+	assert.Equal(t, nil, err)
 	assert.Equal(t, true, isValidUUID(labid))
 
 	// Check if lab exists in DynamoDB
