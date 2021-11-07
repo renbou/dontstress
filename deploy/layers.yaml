@@ -1,0 +1,9 @@
+langsStatic:
+  path: ../lambda-api/static/langs
+  name: ${sls:stage}-langsStatic
+  description: Supported languages
+
+runtimesStatic:
+  path: ../lambda-api/static/runtimes
+  name: ${sls:stage}-runtimesStatic
+  description: Python runtime

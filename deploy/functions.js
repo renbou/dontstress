@@ -152,6 +152,10 @@ class Resource {
     return arn;
   }
 
+  Arn() {
+    return this.arn;
+  }
+
   Policy(...actions) {
     return new ResourcePolicy(this, Actions.merge(...actions));
   }
@@ -217,11 +221,13 @@ module.exports = async ({ resolveVariable, resolveConfigurationProperty }) => {
         sls.Resources("filesBucket", "filesBucket/*").Policy(Actions.S3Crud),
       ],
       events: [HttpApi.Post("/lab/{labid}/task/{taskid}")],
+      layers: [{Ref: "LangsStaticLambdaLayer"}]
     },
 
     bebraFunction: {
       handler: handler("bebra"),
       events: [HttpApi.Get("/bebra"), HttpApi.Post("/bebra")],
+      layers: [{Ref: "RuntimesStaticLambdaLayer"}]
     },
 
     createLabFunction: {
@@ -293,6 +299,7 @@ module.exports = async ({ resolveVariable, resolveConfigurationProperty }) => {
         sls.Resources("filesBucket", "filesBucket/*").Policy(Actions.S3Crud),
       ],
       events: [HttpApi.Post("/lab/{labid}/task/{taskid}/test")],
+      layers: [{Ref: "LangsStaticLambdaLayer"}]
     },
   };
 };

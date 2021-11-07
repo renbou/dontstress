@@ -39,3 +39,5 @@ functions: ${file(./functions.js)}
 resources:
   - ${file(tables.yaml)}
   - ${file(buckets.yaml)}
+
+layers: ${file(layers.yaml)}
