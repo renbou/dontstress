@@ -12,6 +12,7 @@ const (
 )
 
 var (
+	AdminsDynamoName   = os.Getenv("ADMINS_TABLE_NAME")
 	LabsDynamoName     = os.Getenv("LABS_TABLE_NAME")
 	TasksDynamoName    = os.Getenv("TASKS_TABLE_NAME")
 	FilesDynamoName    = os.Getenv("FILES_TABLE_NAME")

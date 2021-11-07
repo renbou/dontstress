@@ -11,6 +11,8 @@ require (
 	github.com/google/uuid v1.3.0
 	github.com/guregu/dynamo v1.11.0
 	github.com/nanmu42/limitio v0.6.0
+	github.com/joho/godotenv v1.4.0
 	github.com/renbou/aws-lambda-go-api-proxy v0.11.2
+	github.com/stretchr/testify v1.6.1
 	gopkg.in/go-playground/assert.v1 v1.2.1 // indirect
 )

@@ -29,6 +29,7 @@ provider:
   architecture: x86_64
   environment:
     # Global env vars for DAO
+    ADMINS_TABLE_NAME: !Ref adminsTable
     LABS_TABLE_NAME: !Ref labsTable
     TASKS_TABLE_NAME: !Ref tasksTable
     FILES_TABLE_NAME: !Ref filesTable
@@ -40,3 +41,5 @@ functions: ${file(deploy/functions.js)}
 resources:
   - ${file(deploy/tables.yaml)}
   - ${file(deploy/buckets.yaml)}
+
+layers: ${file(deploy/layers.yaml)}

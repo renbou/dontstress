@@ -2,8 +2,7 @@ package main
 
 import (
 	"encoding/json"
-	_ "io/ioutil"
-	_ "mime/multipart"
+	"github.com/renbou/dontstress/lambda-api/auth"
 
 	"github.com/renbou/dontstress/internal/utils"
 
@@ -17,23 +16,33 @@ import (
 
 func handler(request events.APIGatewayV2HTTPRequest) (events.APIGatewayV2HTTPResponse, error) {
 	app := fiber.New()
+
+	app.Use(auth.New())
+
 	app.Post("/lab/:labid/tasks", func(c *fiber.Ctx) error {
 		var task models.Task
 		err := json.Unmarshal(c.Body(), &task)
 		if ok := utils.Check(c, err); !ok {
 			return err
 		}
+
+		if ok := utils.Validate(c, task); !ok {
+			return err
+		}
+
 		task.LabId = c.Params("labid")
 		count, err := dao.TaskDao().GetCount(task.LabId)
 		if ok := utils.Check(c, err); !ok {
 			return err
 		}
+
 		task.Num = count
 		err = dao.TaskDao().Create(&task)
 		if ok := utils.Check(c, err); !ok {
 			return err
 		}
-		return c.JSON(task)
+
+		return c.JSON(task.ToDTO())
 	})
 
 	adapter := fiberadapter.New(app)

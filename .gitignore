@@ -23,3 +23,7 @@ serverless/y
 .serverless
 .bin
 node_modules
+.env
+.env.example
+.env.local
+.env.staging

@@ -2,6 +2,7 @@ package main
 
 import (
 	"encoding/json"
+	"github.com/renbou/dontstress/lambda-api/auth"
 	"strconv"
 
 	"github.com/renbou/dontstress/internal/utils"
@@ -16,15 +17,17 @@ import (
 )
 
 type payload struct {
-	Filetype string `json:"type"`
+	Filetype string `json:"type" validate:"required"`
 	File     struct {
-		Lang string `json:"lang"`
-		Data string `json:"data"`
-	} `json:"file"`
+		Lang string `json:"lang" validate:"required"`
+		Data string `json:"data" validate:"required"`
+	} `json:"file" validate:"required"`
 }
 
 func handler(request events.APIGatewayV2HTTPRequest) (events.APIGatewayV2HTTPResponse, error) {
 	app := fiber.New()
+
+	app.Use(auth.New())
 
 	app.Post("/lab/:labid/task/:taskid", func(c *fiber.Ctx) error {
 		labId := c.Params("labid")
@@ -36,6 +39,10 @@ func handler(request events.APIGatewayV2HTTPRequest) (events.APIGatewayV2HTTPRes
 
 		var payload payload
 		err = json.Unmarshal(c.Body(), &payload)
+
+		if ok := utils.Validate(c, payload); !ok {
+			return err
+		}
 
 		if ok := utils.Check(c, err); !ok {
 			return err
@@ -65,7 +72,10 @@ func handler(request events.APIGatewayV2HTTPRequest) (events.APIGatewayV2HTTPRes
 			return err
 		}
 
-		return c.JSON(file)
+		return c.JSON(fiber.Map{
+			"type": payload.Filetype,
+			"file": file.ToDTO(payload.File.Data),
+		})
 	})
 
 	adapter := fiberadapter.New(app)

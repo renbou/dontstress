@@ -6,6 +6,7 @@ import (
 	"github.com/gofiber/fiber/v2"
 	fiberadapter "github.com/renbou/aws-lambda-go-api-proxy/fiber"
 	"github.com/renbou/dontstress/internal/dao"
+	"github.com/renbou/dontstress/internal/dto"
 	"github.com/renbou/dontstress/internal/utils"
 )
 
@@ -17,7 +18,12 @@ func handler(request events.APIGatewayV2HTTPRequest) (events.APIGatewayV2HTTPRes
 		if ok := utils.Check(c, err); !ok {
 			return err
 		}
-		return c.JSON(labs)
+
+		var labdtos []dto.LabDTO
+		for _, lab := range labs {
+			labdtos = append(labdtos, *lab.ToDTO())
+		}
+		return c.JSON(labdtos)
 	})
 
 	adapter := fiberadapter.New(app)

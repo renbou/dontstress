@@ -1,10 +1,8 @@
 package main
 
 import (
-	_ "io/ioutil"
-	_ "mime/multipart"
-
 	"github.com/renbou/dontstress/internal/utils"
+	"github.com/renbou/dontstress/lambda-api/auth"
 
 	"github.com/aws/aws-lambda-go/events"
 	"github.com/aws/aws-lambda-go/lambda"
@@ -17,13 +15,16 @@ import (
 func handler(request events.APIGatewayV2HTTPRequest) (events.APIGatewayV2HTTPResponse, error) {
 	app := fiber.New()
 
+	app.Use(auth.New())
+
 	app.Delete("/lab/:labid", func(c *fiber.Ctx) error {
 		lab := models.Lab{Id: c.Params("labid")}
 		err := dao.LabDao().Delete(&lab)
 		if ok := utils.Check(c, err); !ok {
 			return err
 		}
-		return c.Status(fiber.StatusOK).JSON(fiber.Map{})
+		c.Status(fiber.StatusOK)
+		return nil
 	})
 
 	adapter := fiberadapter.New(app)

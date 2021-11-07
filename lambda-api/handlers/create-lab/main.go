@@ -2,9 +2,7 @@ package main
 
 import (
 	"encoding/json"
-	_ "io/ioutil"
-	_ "mime/multipart"
-	_ "os"
+	"github.com/renbou/dontstress/lambda-api/auth"
 
 	"github.com/aws/aws-lambda-go/events"
 	"github.com/aws/aws-lambda-go/lambda"
@@ -18,9 +16,16 @@ import (
 func handler(request events.APIGatewayV2HTTPRequest) (events.APIGatewayV2HTTPResponse, error) {
 	app := fiber.New()
 
+	app.Use(auth.New())
+
 	app.Post("/labs", func(c *fiber.Ctx) error {
 		var lab models.Lab
 		err := json.Unmarshal(c.Body(), &lab)
+
+		if ok := utils.Validate(c, lab); !ok {
+			return err
+		}
+
 		if ok := utils.Check(c, err); !ok {
 			return err
 		}
@@ -30,7 +35,7 @@ func handler(request events.APIGatewayV2HTTPRequest) (events.APIGatewayV2HTTPRes
 		if ok := utils.Check(c, err); !ok {
 			return err
 		}
-		return c.JSON(lab)
+		return c.JSON(lab.Id)
 	})
 
 	adapter := fiberadapter.New(app)

@@ -5,6 +5,10 @@ import (
 	"github.com/renbou/dontstress/internal/dao/interfaces"
 )
 
+func AdminDao() interfaces.AdminDao {
+	return &dynamodb.AdminImpl{}
+}
+
 func FileDao() interfaces.FileDao {
 	return &dynamodb.FileImpl{}
 }

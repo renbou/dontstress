@@ -15,8 +15,8 @@ import (
 )
 
 type payload struct {
-	Lang string `json:"lang"`
-	Data string `json:"data"`
+	Lang string `json:"lang" validate:"required"`
+	Data string `json:"data" validate:"required"`
 }
 
 func handler(request events.APIGatewayV2HTTPRequest) (events.APIGatewayV2HTTPResponse, error) {
@@ -33,6 +33,10 @@ func handler(request events.APIGatewayV2HTTPRequest) (events.APIGatewayV2HTTPRes
 		var payload payload
 		err = json.Unmarshal(c.Body(), &payload)
 		if ok := utils.Check(c, err); !ok {
+			return err
+		}
+
+		if ok := utils.Validate(c, payload); !ok {
 			return err
 		}
 
@@ -62,7 +66,7 @@ func handler(request events.APIGatewayV2HTTPRequest) (events.APIGatewayV2HTTPRes
 			return err
 		}
 
-		return c.JSON(testrun)
+		return c.JSON(testrun.Id)
 	})
 
 	adapter := fiberadapter.New(app)

@@ -1,10 +1,12 @@
 package models
 
+import "github.com/renbou/dontstress/internal/dto"
+
 type Run struct {
-	Id     string `dynamo:"id" json:"-"`
-	Labid  string `dynamo:"labid" json:"-"`
-	Taskid int    `dynamo:"taskid" json:"-"`
-	Fileid string `dynamo:"fileid" json:"-"`
+	Id     string `dynamo:"id" json:"id"`
+	Labid  string `dynamo:"labid" json:"labid"`
+	Taskid int    `dynamo:"taskid" json:"taskid"`
+	Fileid string `dynamo:"fileid" json:"fileid"`
 	Status string `dynamo:"status" json:"status"`
 	Tests  []struct {
 		Result  string `dynamo:"results" json:"result"`
@@ -15,4 +17,8 @@ type Run struct {
 			Got      string `dynamo:"got" json:"got"`
 		} `dynamo:"info" json:"info"`
 	} `dynamo:"tests" json:"tests"`
+}
+
+func (run *Run) ToDTO() *dto.RunDTO {
+	return &dto.RunDTO{Status: run.Status, Tests: run.Tests}
 }
