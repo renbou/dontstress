@@ -12,9 +12,10 @@ const (
 )
 
 var (
-	baseUrl      = getEnv("BASE_URL")
-	defaultLabId = getEnv("DEFAULT_LAB_ID")
-	validToken   = getEnv("VALID_TOKEN")
+	baseUrl       = getEnv("BASE_URL")
+	defaultLabId  = getEnv("DEFAULT_LAB_ID")
+	defaultTaskId = getEnv("DEFAULT_TASK_ID")
+	validToken    = getEnv("VALID_TOKEN")
 )
 
 func getEnv(key string) string {
