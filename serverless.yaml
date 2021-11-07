@@ -16,6 +16,9 @@ custom:
   tableBillingMode: PAY_PER_REQUEST
   prefix: ${self:service}-${sls:stage}
 
+package:
+  excludeDevDependencies: false
+
 provider:
   name: aws
   region: eu-west-1
@@ -35,6 +38,7 @@ provider:
     FILES_TABLE_NAME: !Ref filesTable
     RUNS_TABLE_NAME: !Ref testRunsTable
     BUCKET_NAME: !Ref filesBucket
+    LD_LIBRARY_PATH: /opt/lib
 
 functions: ${file(deploy/functions.js)}
 
