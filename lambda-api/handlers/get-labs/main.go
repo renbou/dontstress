@@ -20,7 +20,7 @@ func initApp() {
 			return err
 		}
 
-		var labDtos []dto.LabDTO
+		labDtos := []dto.LabDTO{}
 		for _, lab := range labs {
 			labDtos = append(labDtos, *lab.ToDTO())
 		}

@@ -21,7 +21,7 @@ func initApp() {
 			return err
 		}
 
-		var taskDtos []dto.TaskDTO
+		taskDtos := []dto.TaskDTO{}
 		for _, task := range tasks {
 			taskDtos = append(taskDtos, *task.ToDTO())
 		}
