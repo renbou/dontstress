@@ -9,38 +9,34 @@ import (
 	"os"
 )
 
-func getLangs() ([]string, error) {
+var LangsSet = getLangs()
+
+func getLangs() map[string]bool {
 	jsonFile, err := os.Open("/opt/langs.json")
 	if err != nil {
-		return nil, err
+		return nil
 	}
 	defer jsonFile.Close()
 
 	content, err := ioutil.ReadAll(jsonFile)
 	if err != nil {
-		return nil, err
+		return nil
 	}
 
 	var langs []string
 	err = json.Unmarshal(content, &langs)
 	if err != nil {
-		return nil, err
+		return nil
 	}
-
-	return langs, nil
+	langsSet := map[string]bool{}
+	for _, lang := range langs {
+		langsSet[lang] = true
+	}
+	return langsSet
 }
 
 func ValidLang(lang string) bool {
-	langs, err := getLangs()
-	if err != nil {
-		return false
-	}
-	for _, l := range langs {
-		if l == lang {
-			return true
-		}
-	}
-	return false
+	return LangsSet != nil && LangsSet[lang]
 }
 
 func GetId() string {
