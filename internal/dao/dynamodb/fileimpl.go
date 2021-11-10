@@ -18,3 +18,11 @@ func (dao *FileImpl) Delete(file *models.File) error {
 	table := db.Table(FilesDynamoName)
 	return table.Delete("id", file.Id).Run()
 }
+
+func (dao *FileImpl) Update(fileId string, connectionId string) error {
+	db := getDB()
+	table := db.Table(FilesDynamoName)
+	update := table.Update("id", fileId)
+	update.Set("connectionId", connectionId)
+	return update.Run()
+}
