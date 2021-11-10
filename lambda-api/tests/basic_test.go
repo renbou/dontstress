@@ -240,7 +240,6 @@ func Test_LangValidationUnsupported(t *testing.T) {
 		"lang": "bebra++",
 		"data": "bebra main(){ return bebra; }",
 	})
-	println(baseUrl + "/lab/" + defaultLabId + "/task/" + defaultTaskId + "/test")
 	response, err := http.Post(baseUrl+"/lab/"+defaultLabId+"/task/"+defaultTaskId+"/test", contentType, bytes.NewBuffer(postBody))
 	if err != nil {
 		log.Fatalln(err)
