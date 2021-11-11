@@ -1,0 +1,61 @@
+# All dynamodb tables
+Resources:
+  labsTable:
+    Type: AWS::DynamoDB::Table
+    Properties:
+      TableName: ${self:custom.prefix}-labs-table
+      AttributeDefinitions:
+        - AttributeName: id
+          AttributeType: S
+      KeySchema:
+        - AttributeName: id
+          KeyType: HASH
+      BillingMode: ${self:custom.tableBillingMode}
+  tasksTable:
+    Type: AWS::DynamoDB::Table
+    Properties:
+      TableName: ${self:custom.prefix}-tasks-table
+      AttributeDefinitions:
+        - AttributeName: labid
+          AttributeType: S
+        - AttributeName: num
+          AttributeType: "N"
+      KeySchema:
+        - AttributeName: labid
+          KeyType: HASH
+        - AttributeName: num
+          KeyType: RANGE
+      BillingMode: ${self:custom.tableBillingMode}
+  filesTable:
+    Type: AWS::DynamoDB::Table
+    Properties:
+      TableName: ${self:custom.prefix}-files-table
+      AttributeDefinitions:
+        - AttributeName: id
+          AttributeType: S
+      KeySchema:
+        - AttributeName: id
+          KeyType: HASH
+      BillingMode: ${self:custom.tableBillingMode}
+  testRunsTable:
+    Type: AWS::DynamoDB::Table
+    Properties:
+      TableName: ${self:custom.prefix}-testruns-table
+      AttributeDefinitions:
+        - AttributeName: id
+          AttributeType: S
+      KeySchema:
+        - AttributeName: id
+          KeyType: HASH
+      BillingMode: ${self:custom.tableBillingMode}
+  adminsTable:
+    Type: AWS::DynamoDB::Table
+    Properties:
+      TableName: ${self:custom.prefix}-admins-table
+      AttributeDefinitions:
+        - AttributeName: id
+          AttributeType: S
+      KeySchema:
+        - AttributeName: id
+          KeyType: HASH
+      BillingMode: ${self:custom.tableBillingMode}

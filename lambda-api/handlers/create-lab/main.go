@@ -2,45 +2,44 @@ package main
 
 import (
 	"encoding/json"
-	_ "io/ioutil"
-	_ "mime/multipart"
-	_ "os"
-
 	"github.com/aws/aws-lambda-go/events"
 	"github.com/aws/aws-lambda-go/lambda"
 	"github.com/gofiber/fiber/v2"
-	"github.com/renbou/aws-lambda-go-api-proxy/fiber"
+	fiberadapter "github.com/renbou/aws-lambda-go-api-proxy/fiber"
 	"github.com/renbou/dontstress/internal/dao"
 	"github.com/renbou/dontstress/internal/models"
 	"github.com/renbou/dontstress/internal/utils"
+	"github.com/renbou/dontstress/lambda-api/auth"
 )
 
-func handler(request events.APIGatewayV2HTTPRequest) (events.APIGatewayV2HTTPResponse, error) {
-	app := fiber.New()
+var app = fiber.New()
+var adapter = fiberadapter.New(app)
+
+func initApp() {
+	app.Use(auth.New())
 
 	app.Post("/labs", func(c *fiber.Ctx) error {
 		var lab models.Lab
 		err := json.Unmarshal(c.Body(), &lab)
-		if err != nil {
-			return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{
-				"error": err.Error(),
-			})
+
+		if ok := utils.Validate(c, lab); !ok {
+			return err
 		}
 
+		if ok := utils.Check(c, err); !ok {
+			return err
+		}
+
+		lab.Id = utils.GetId()
 		err = dao.LabDao().Create(&lab)
-
-		if err != nil {
-			return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{
-				"error": err.Error(),
-			})
+		if ok := utils.Check(c, err); !ok {
+			return err
 		}
-		id := utils.GetId()
-		lab.Id = id
-		return c.JSON(lab)
+		return c.JSON(lab.Id)
 	})
+}
 
-	adapter := fiberadapter.New(app)
-
+func handler(request events.APIGatewayV2HTTPRequest) (events.APIGatewayV2HTTPResponse, error) {
 	if resp, err := adapter.ProxyV2(request); err != nil {
 		return events.APIGatewayV2HTTPResponse{}, err
 	} else {
@@ -49,5 +48,6 @@ func handler(request events.APIGatewayV2HTTPRequest) (events.APIGatewayV2HTTPRes
 }
 
 func main() {
+	initApp()
 	lambda.Start(handler)
 }

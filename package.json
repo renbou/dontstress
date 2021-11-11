@@ -1,0 +1,17 @@
+{
+  "name": "dontstress",
+  "version": "0.2.0",
+  "description": "Don't stress too much over your failing task solution, let others stress for you.",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/renbou/dontstress.git"
+  },
+  "author": "renbou and olefirenque",
+  "license": "Apache-2.0",
+  "devDependencies": {
+    "@serverless/typescript": "^2.65.0",
+    "serverless": "^2.65.0",
+    "serverless-go": "github:renbou/serverless-go",
+    "serverless-iam-roles-per-function": "^3.2.0"
+  }
+}

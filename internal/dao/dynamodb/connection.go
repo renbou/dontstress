@@ -12,14 +12,15 @@ const (
 )
 
 var (
+	AdminsDynamoName   = os.Getenv("ADMINS_TABLE_NAME")
 	LabsDynamoName     = os.Getenv("LABS_TABLE_NAME")
 	TasksDynamoName    = os.Getenv("TASKS_TABLE_NAME")
 	FilesDynamoName    = os.Getenv("FILES_TABLE_NAME")
 	TestrunsDynamoName = os.Getenv("RUNS_TABLE_NAME")
 )
 
+var db = dynamo.New(session.Must(session.NewSession()), &aws.Config{Region: aws.String(REGION)})
+
 func getDB() *dynamo.DB {
-	sess := session.Must(session.NewSession())
-	db := dynamo.New(sess, &aws.Config{Region: aws.String(REGION)})
 	return db
 }
