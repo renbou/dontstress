@@ -9,9 +9,8 @@
   "author": "renbou and olefirenque",
   "license": "Apache-2.0",
   "devDependencies": {
-    "@serverless/typescript": "^2.65.0",
-    "serverless": "^2.65.0",
-    "serverless-go": "github:renbou/serverless-go",
+    "@serverless-rewrite/serverless": "^3.0.0-pre.3",
+    "@serverless-rewrite/serverless-go": "^0.2.4-pre.3",
     "serverless-iam-roles-per-function": "^3.2.0"
   }
 }
