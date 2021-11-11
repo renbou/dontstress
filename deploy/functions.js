@@ -212,6 +212,17 @@ module.exports = async ({ resolveVariable, resolveConfigurationProperty }) => {
     `github.com/renbou/dontstress/lambda-api/handlers/${name}`;
 
   return {
+
+    webSocketApiFunction: {
+      handler: "github.com/renbou/dontstress/lambda-api/websockets/connect",
+      iamRoleStatements: [
+          sls.Resource("filesTable").Policy(Actions.DynamoDBCrud),
+      ],
+      events: [
+          {websocket: {route: "$connect"}},
+      ],
+    },
+
     addTaskDataFunction: {
       handler: handler("add-task-data"),
       iamRoleStatements: [
