@@ -2,13 +2,13 @@ service: dontstress
 
 projectDir: ../
 
-frameworkVersion: "2"
-configValidationMode: error
+frameworkVersion: "3"
+configValidationMode: off
 variablesResolutionMode: "20210326"
 
 plugins:
   - serverless-iam-roles-per-function
-  - serverless-go
+  - "@serverless-rewrite/serverless-go"
 
 custom:
   go:

@@ -11,17 +11,17 @@ func SwitchDir(path string) (oldpwd string, err error) {
 	return oldpwd, nil
 }
 
-func WithDir(wrapped func() error, dir string) error {
+func WithDir(wrapped func(string) error, dir string) error {
 	old, err := SwitchDir(dir)
 	if err != nil {
 		return err
 	}
 
 	defer SwitchDir(old)
-	return wrapped()
+	return wrapped(dir)
 }
 
-func WithTempDir(wrapped func() error) error {
+func WithTempDir(wrapped func(string) error) error {
 	dir, err := os.MkdirTemp("", "stress")
 	if err != nil {
 		return err

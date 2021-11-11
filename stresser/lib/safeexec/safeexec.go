@@ -9,7 +9,7 @@ import (
 	"syscall"
 
 	"github.com/nanmu42/limitio"
-	"github.com/renbou/dontstress/stresser/testrunner/template"
+	"github.com/renbou/dontstress/stresser/lib/template"
 )
 
 // Custom cmd struct with given method to check if stdout size was exceeded
