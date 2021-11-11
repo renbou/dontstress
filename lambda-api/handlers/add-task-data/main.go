@@ -77,10 +77,7 @@ func initApp() {
 			return err
 		}
 
-		return c.JSON(fiber.Map{
-			"type": payload.Filetype,
-			"file": file.ToDTO(payload.File.Data),
-		})
+		return c.JSON(id)
 	})
 }
 
