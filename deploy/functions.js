@@ -96,6 +96,17 @@ const Actions = (() => {
     return [...new Set(acts.flat())];
   };
 
+  actions.DynamoDBStreamListen = [
+    "dynamodb:DescribeStream",
+    "dynamodb:GetRecords",
+    "dynamodb:GetShardIterator",
+    "dynamodb:ListStreams",
+  ];
+
+  actions.WebSocketExecution = [
+    "execute-api:ManageConnections",
+  ]
+
   actions.DynamoDBRead = [
     "dynamodb:GetItem",
     "dynamodb:BatchGetItem",
@@ -220,6 +231,36 @@ module.exports = async ({ resolveVariable, resolveConfigurationProperty }) => {
       ],
       events: [
           {websocket: {route: "$connect"}},
+      ],
+    },
+
+    publishMessage: {
+      handler: handler("publish-message"),
+      iamRoleStatements: [
+          sls.Resource("filesTable")
+              .Policy(Actions.DynamoDBCrud)
+              .Policy(Actions.DynamoDBStreamListen),
+        {
+          "Effect": "Allow",
+          "Action": [
+            "execute-api:Invoke",
+            "execute-api:ManageConnections"
+          ],
+          "Resource": "*"
+          // Unsupported attribute Arn
+          // { "Fn::GetAtt": [ "WebsocketsApi", "Arn" ] }
+        }
+      ],
+      events: [
+        {
+          stream: {
+            type: "dynamodb",
+            enabled: true,
+            batchSize: 100,
+            startingPosition: "LATEST",
+            arn: { "Fn::GetAtt": [ "filesTable", "StreamArn" ] },
+          }
+        },
       ],
     },
 

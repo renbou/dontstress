@@ -37,6 +37,8 @@ Resources:
         - AttributeName: id
           KeyType: HASH
       BillingMode: ${self:custom.tableBillingMode}
+      StreamSpecification:
+        StreamViewType: NEW_AND_OLD_IMAGES
   testRunsTable:
     Type: AWS::DynamoDB::Table
     Properties:

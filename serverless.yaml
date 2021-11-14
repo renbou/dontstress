@@ -37,6 +37,14 @@ provider:
     TASKS_TABLE_NAME: !Ref tasksTable
     FILES_TABLE_NAME: !Ref filesTable
     RUNS_TABLE_NAME: !Ref testRunsTable
+    WS_ENDPOINT:
+      Fn::Join:
+        - ''
+        - - https://
+          - Ref: WebsocketsApi
+          - ".execute-api.eu-west-1."
+          - Ref: AWS::URLSuffix
+          - "/${sls:stage}"
     BUCKET_NAME: !Ref filesBucket
     LD_LIBRARY_PATH: /opt/lib
 
